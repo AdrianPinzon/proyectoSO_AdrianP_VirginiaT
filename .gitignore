@@ -1,5 +1,5 @@
 # ============================================
-# ARCHIVOS DE NETBEANS - OBLIGATORIO IGNORAR
+# ARCHIVOS NETBEANS - CRÍTICO IGNORAR
 # ============================================
 
 # Configuraciones personales de cada desarrollador
@@ -12,92 +12,54 @@
 /nbdist/
 /.nb-gradle/
 
-# Metadata del IDE NetBeans
-/nbproject/private/
-*.orig
-
 # ============================================
-# ARCHIVOS COMPILADOS JAVA - CRÍTICO IGNORAR
+# ARCHIVOS COMPILADOS JAVA - SE REGENERAN
 # ============================================
 
-# Archivos .class (se generan automáticamente)
+# Bytecode compilado
 *.class
 
-# Paquetes ejecutables (se generan automáticamente)
+# Archivos ejecutables
 *.jar
 *.war
 *.ear
 
 # ============================================
-# ARCHIVOS DEL SISTEMA OPERATIVO
+# SISTEMA OPERATIVO
 # ============================================
 
 # macOS
 .DS_Store
 .AppleDouble
 .LSOverride
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
 
 # Windows
+Thumbs.db
 Desktop.ini
-$RECYCLE.BIN/
-
-# Linux
-*~
-.directory
 
 # ============================================
-# ARCHIVOS DE LOG Y TEMPORALES
+# TEMPORALES Y LOGS
 # ============================================
-
-# Logs de aplicación
-*.log
-logs/
 
 # Archivos temporales
 *.tmp
 *.temp
 *.cache
-*.swp
-*.swo
+*.log
 
 # Backup files
 *.bak
 *.backup
+*~
 
 # ============================================
-# ARCHIVOS DE CONFIGURACIÓN LOCAL
+# CONFIGURACIONES LOCALES
 # ============================================
 
-# Configuraciones locales específicas de cada desarrollador
+# Configuraciones específicas de cada developer
 *.properties
-config/local.properties
+config/local/
 
-# Configuraciones de IDE
+# Archivos de IDE
 /.idea/
-*.iws
 *.iml
-*.ipr
-
-# ============================================
-# ARCHIVOS DE DATOS TEMPORALES DEL PROYECTO
-# ============================================
-
-# Si usas base de datos temporal
-*.db
-*.sqlite
-*.h2.db
-
-# Archivos de datos de prueba temporales
-/temp/
-/tmp/
-
-# ============================================
-# CARPETAS DE ENTREGABLES (si las creas)
-# ============================================
-
-# Si creas carpeta para el informe PDF
-/informes/entrega/
