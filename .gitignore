@@ -1,0 +1,103 @@
+# ============================================
+# ARCHIVOS DE NETBEANS - OBLIGATORIO IGNORAR
+# ============================================
+
+# Configuraciones personales de cada desarrollador
+/nbproject/private/
+
+# Archivos de construcción automática
+/build/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# Metadata del IDE NetBeans
+/nbproject/private/
+*.orig
+
+# ============================================
+# ARCHIVOS COMPILADOS JAVA - CRÍTICO IGNORAR
+# ============================================
+
+# Archivos .class (se generan automáticamente)
+*.class
+
+# Paquetes ejecutables (se generan automáticamente)
+*.jar
+*.war
+*.ear
+
+# ============================================
+# ARCHIVOS DEL SISTEMA OPERATIVO
+# ============================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+
+# ============================================
+# ARCHIVOS DE LOG Y TEMPORALES
+# ============================================
+
+# Logs de aplicación
+*.log
+logs/
+
+# Archivos temporales
+*.tmp
+*.temp
+*.cache
+*.swp
+*.swo
+
+# Backup files
+*.bak
+*.backup
+
+# ============================================
+# ARCHIVOS DE CONFIGURACIÓN LOCAL
+# ============================================
+
+# Configuraciones locales específicas de cada desarrollador
+*.properties
+config/local.properties
+
+# Configuraciones de IDE
+/.idea/
+*.iws
+*.iml
+*.ipr
+
+# ============================================
+# ARCHIVOS DE DATOS TEMPORALES DEL PROYECTO
+# ============================================
+
+# Si usas base de datos temporal
+*.db
+*.sqlite
+*.h2.db
+
+# Archivos de datos de prueba temporales
+/temp/
+/tmp/
+
+# ============================================
+# CARPETAS DE ENTREGABLES (si las creas)
+# ============================================
+
+# Si creas carpeta para el informe PDF
+/informes/entrega/
