@@ -10,7 +10,7 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("🚀 Iniciando Simulador de Planificación de Procesos");
         
-        // Configurar look and feel
+        
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeel());
         } catch (Exception e) {
