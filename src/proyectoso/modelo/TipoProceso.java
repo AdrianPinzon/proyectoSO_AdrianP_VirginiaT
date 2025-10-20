@@ -4,10 +4,7 @@
  */
 package proyectoso.modelo;
 
-/**
- *
- * @author eduardopinzon
- */
 public enum TipoProceso {
-    CPU_BOUND, IO_BOUND
+    CPU_BOUND,  // Muy consumidor de procesador
+    IO_BOUND    // Muy consumidor de E/S
 }
