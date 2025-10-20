@@ -4,167 +4,410 @@
  */
 package proyectoso.vista;
 
-import proyectoso.hilos.HiloSimulador;
+import proyectoso.controlador.ControladorSimulador;
 import proyectoso.modelo.*;
+import proyectoso.util.Metricas;
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.util.List;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class VentanaPrincipal extends JFrame {
-    private HiloSimulador hiloSimulador;
-    private GestorColas gestorColas;
+public class VentanaPrincipal extends JFrame implements Vista {
+    private ControladorSimulador controlador;
     
-    // Componentes de la interfaz
-    private JLabel lblProcesoEjecucion;
-    private JLabel lblCicloGlobal;
-    private JTextArea txtColaListos;
-    private JTextArea txtColaBloqueados;
-    private JButton btnIniciar;
-    private JButton btnPausar;
+    // PANELES PRINCIPALES
+    private JPanel panelPrincipal;
+    private JPanel panelControl;
+    private JPanel panelColas;
+    private JPanel panelCPU;
+    private JPanel panelMetricas;
+    private JPanel panelConfiguracion;
+    
+    // COMPONENTES DE CONTROL
+    private JButton btnIniciar, btnPausar, btnReanudar, btnDetener, btnReiniciar;
     private JButton btnAgregarProceso;
+    private JComboBox<String> comboPlanificadores;
+    private JLabel lblEstadoSimulacion;
+    private JLabel lblPlanificadorActual;
     
-    public VentanaPrincipal() {
+    // COMPONENTES DE COLAS
+    private JScrollPane scrollListos, scrollBloqueados, scrollTerminados;
+    private JScrollPane scrollListosSuspendidos, scrollBloqueadosSuspendidos;
+
+    private JTextArea areaListos, areaBloqueados, areaTerminados;
+    private JTextArea areaListosSuspendidos, areaBloqueadosSuspendidos;
+    
+    // COMPONENTES DE CPU
+    private JLabel lblProcesoEjecutando, lblPC, lblMAR, lblInstrucciones;
+    private JLabel lblQuantum, lblCicloActual;
+    
+    // COMPONENTES DE CONFIGURACIÓN
+    private JSpinner spinnerDuracionCiclo, spinnerQuantum;
+    private JSpinner spinnerCiclosExcepcion, spinnerCiclosSatisfaccion;
+    
+    // COMPONENTES DE MÉTRICAS
+    private JLabel lblThroughput, lblUtilizacionCPU, lblTiempoRespuesta;
+    private JLabel lblProcesosCompletados, lblCiclosTotales;
+    
+    public VentanaPrincipal(ControladorSimulador controlador) {
+        this.controlador = controlador;
+        this.controlador.setVista(this);
+        
+        // INICIALIZAR COMPONENTES PRIMERO
         inicializarComponentes();
         configurarVentana();
-        inicializarSistema();
-    }
-    
-    private void inicializarSistema() {
-        this.gestorColas = new GestorColas();
-        this.hiloSimulador = new HiloSimulador(gestorColas);
         
-        // Agregar procesos de prueba
-        agregarProcesosPrueba();
-    }
-    
-    private void agregarProcesosPrueba() {
-        Proceso p1 = new Proceso("P1", "Navegador", 50, TipoProceso.CPU_BOUND);
-        Proceso p2 = new Proceso("P2", "Editor", 30, TipoProceso.CPU_BOUND);
-        Proceso p3 = new Proceso("P3", "Descarga", 20, TipoProceso.IO_BOUND);
-        p3.setCiclosParaExcepcion(5);
-        p3.setCiclosParaSatisfacer(3);
-        
-        gestorColas.agregarProceso(p1);
-        gestorColas.agregarProceso(p2);
-        gestorColas.agregarProceso(p3);
-        
-        actualizarInterfaz();
+        // ACTUALIZAR VISTA DESPUÉS DE QUE TODO ESTÉ CREADO
+        SwingUtilities.invokeLater(() -> {
+            actualizarVista();
+        });
     }
     
     private void inicializarComponentes() {
-        setLayout(new BorderLayout());
+        // CONFIGURACIÓN BÁSICA DE LA VENTANA
+        setTitle("Simulador de Planificación de Procesos - Sistemas Operativos");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(1200, 800);
+        setLocationRelativeTo(null);
         
-        // Panel superior - Información general
-        JPanel panelSuperior = new JPanel(new GridLayout(1, 2));
-        lblProcesoEjecucion = new JLabel("CPU: Libre");
-        lblCicloGlobal = new JLabel("Ciclo: 0");
-        panelSuperior.add(lblProcesoEjecucion);
-        panelSuperior.add(lblCicloGlobal);
-        add(panelSuperior, BorderLayout.NORTH);
+        // INICIALIZAR PANELES PRIMERO
+        panelPrincipal = new JPanel(new BorderLayout());
+        panelControl = new JPanel(new FlowLayout());
+        panelColas = new JPanel(new GridLayout(2, 3, 5, 5));
+        panelCPU = new JPanel(new GridLayout(6, 1, 5, 5));
+        panelMetricas = new JPanel(new GridLayout(5, 1, 10, 10));
+        panelConfiguracion = new JPanel(new GridLayout(4, 2, 10, 10));
         
-        // Panel central - Colas de procesos
-        JPanel panelCentral = new JPanel(new GridLayout(1, 2));
+        // CREAR COMPONENTES
+        crearComponentesControl();
+        crearComponentesColas();
+        crearComponentesCPU();
+        crearComponentesMetricas();
+        crearComponentesConfiguracion();
         
-        txtColaListos = new JTextArea(10, 20);
-        txtColaListos.setEditable(false);
-        txtColaListos.setText("COLA DE LISTOS:\n");
-        panelCentral.add(new JScrollPane(txtColaListos));
+        // ORGANIZAR PANELES
+        organizarPaneles();
+    }
+    
+    private void crearComponentesControl() {
+        panelControl.setBorder(BorderFactory.createTitledBorder("Control de Simulación"));
         
-        txtColaBloqueados = new JTextArea(10, 20);
-        txtColaBloqueados.setEditable(false);
-        txtColaBloqueados.setText("COLA DE BLOQUEADOS:\n");
-        panelCentral.add(new JScrollPane(txtColaBloqueados));
-        
-        add(panelCentral, BorderLayout.CENTER);
-        
-        // Panel inferior - Controles
-        JPanel panelInferior = new JPanel();
-        btnIniciar = new JButton("Iniciar Simulación");
+        // BOTONES DE CONTROL
+        btnIniciar = new JButton("Iniciar");
         btnPausar = new JButton("Pausar");
+        btnReanudar = new JButton("Reanudar");
+        btnDetener = new JButton("Detener");
+        btnReiniciar = new JButton("Reiniciar");
         btnAgregarProceso = new JButton("Agregar Proceso");
         
-        btnIniciar.addActionListener(e -> iniciarSimulacion());
-        btnPausar.addActionListener(e -> pausarSimulacion());
-        btnAgregarProceso.addActionListener(e -> agregarProceso());
+        // COMBO BOX DE PLANIFICADORES
+        comboPlanificadores = new JComboBox<>(new String[]{
+            "FCFS", "SJF", "SRTN", "ROUNDROBIN", "PRIORIDAD", "MULTIPLESCOLAS"
+        });
         
-        panelInferior.add(btnIniciar);
-        panelInferior.add(btnPausar);
-        panelInferior.add(btnAgregarProceso);
+        // ETIQUETAS DE ESTADO
+        lblEstadoSimulacion = new JLabel("Estado: Detenido");
+        lblPlanificadorActual = new JLabel("Planificador: FCFS");
         
-        add(panelInferior, BorderLayout.SOUTH);
+        // AGREGAR COMPONENTES
+        panelControl.add(btnIniciar);
+        panelControl.add(btnPausar);
+        panelControl.add(btnReanudar);
+        panelControl.add(btnDetener);
+        panelControl.add(btnReiniciar);
+        panelControl.add(new JLabel("Planificador:"));
+        panelControl.add(comboPlanificadores);
+        panelControl.add(btnAgregarProceso);
+        panelControl.add(lblEstadoSimulacion);
+        panelControl.add(lblPlanificadorActual);
+        
+        // CONFIGURAR EVENTOS
+        configurarEventos();
+    }
+    
+    private void crearComponentesColas() {
+    panelColas.setBorder(BorderFactory.createTitledBorder("Colas de Procesos"));
+    
+    // CREAR ÁREAS DE TEXTO Y SCROLLPANES
+    scrollListos = crearAreaTextoConTitulo("Listos");
+    scrollBloqueados = crearAreaTextoConTitulo("Bloqueados");
+    scrollTerminados = crearAreaTextoConTitulo("Terminados");
+    scrollListosSuspendidos = crearAreaTextoConTitulo("Listos Suspendidos");
+    scrollBloqueadosSuspendidos = crearAreaTextoConTitulo("Bloqueados Suspendidos");
+    
+    // OBTENER LAS ÁREAS DE TEXTO DE LOS SCROLLPANES
+    areaListos = (JTextArea) scrollListos.getViewport().getView();
+    areaBloqueados = (JTextArea) scrollBloqueados.getViewport().getView();
+    areaTerminados = (JTextArea) scrollTerminados.getViewport().getView();
+    areaListosSuspendidos = (JTextArea) scrollListosSuspendidos.getViewport().getView();
+    areaBloqueadosSuspendidos = (JTextArea) scrollBloqueadosSuspendidos.getViewport().getView();
+    
+    // AGREGAR LOS SCROLLPANES AL PANEL
+    panelColas.add(scrollListos);
+    panelColas.add(scrollBloqueados);
+    panelColas.add(scrollTerminados);
+    panelColas.add(scrollListosSuspendidos);
+    panelColas.add(scrollBloqueadosSuspendidos);
+    }
+    
+    private JScrollPane crearAreaTextoConTitulo(String titulo) {
+        JTextArea area = new JTextArea(10, 20);
+        area.setEditable(false);
+        area.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        
+        JScrollPane scrollPane = new JScrollPane(area);
+        scrollPane.setBorder(BorderFactory.createTitledBorder(titulo));
+        return scrollPane;
+    }
+    
+    private void crearComponentesCPU() {
+        panelCPU.setBorder(BorderFactory.createTitledBorder("Estado del CPU"));
+        
+        // ETIQUETAS PARA INFORMACIÓN DEL CPU
+        lblProcesoEjecutando = crearEtiquetaCPU("Proceso ejecutando: Ninguno");
+        lblPC = crearEtiquetaCPU("Program Counter: 0");
+        lblMAR = crearEtiquetaCPU("Memory Address Register: 0");
+        lblInstrucciones = crearEtiquetaCPU("Instrucciones: 0/0");
+        lblQuantum = crearEtiquetaCPU("Quantum actual: 0/0");
+        lblCicloActual = crearEtiquetaCPU("Ciclo actual: 0");
+        
+        panelCPU.add(lblProcesoEjecutando);
+        panelCPU.add(lblPC);
+        panelCPU.add(lblMAR);
+        panelCPU.add(lblInstrucciones);
+        panelCPU.add(lblQuantum);
+        panelCPU.add(lblCicloActual);
+    }
+    
+    private JLabel crearEtiquetaCPU(String texto) {
+        JLabel label = new JLabel(texto);
+        label.setFont(new Font("Arial", Font.BOLD, 14));
+        label.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        return label;
+    }
+    
+    private void crearComponentesMetricas() {
+        panelMetricas.setBorder(BorderFactory.createTitledBorder("Métricas de Rendimiento"));
+        
+        lblThroughput = crearEtiquetaMetrica("Throughput: 0.00 procesos/ciclo");
+        lblUtilizacionCPU = crearEtiquetaMetrica("Utilización CPU: 0.00%");
+        lblTiempoRespuesta = crearEtiquetaMetrica("Tiempo respuesta promedio: 0.00 ciclos");
+        lblProcesosCompletados = crearEtiquetaMetrica("Procesos completados: 0");
+        lblCiclosTotales = crearEtiquetaMetrica("Ciclos totales: 0");
+        
+        panelMetricas.add(lblThroughput);
+        panelMetricas.add(lblUtilizacionCPU);
+        panelMetricas.add(lblTiempoRespuesta);
+        panelMetricas.add(lblProcesosCompletados);
+        panelMetricas.add(lblCiclosTotales);
+    }
+    
+    private JLabel crearEtiquetaMetrica(String texto) {
+        JLabel label = new JLabel(texto);
+        label.setFont(new Font("Arial", Font.PLAIN, 16));
+        label.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        return label;
+    }
+    
+    private void crearComponentesConfiguracion() {
+        panelConfiguracion.setBorder(BorderFactory.createTitledBorder("Configuración del Sistema"));
+        
+        // DURACIÓN DEL CICLO
+        spinnerDuracionCiclo = new JSpinner(new SpinnerNumberModel(1000, 100, 5000, 100));
+        panelConfiguracion.add(new JLabel("Duración del ciclo (ms):"));
+        panelConfiguracion.add(spinnerDuracionCiclo);
+        
+        // QUANTUM
+        spinnerQuantum = new JSpinner(new SpinnerNumberModel(3, 1, 10, 1));
+        panelConfiguracion.add(new JLabel("Quantum (Round Robin):"));
+        panelConfiguracion.add(spinnerQuantum);
+        
+        // CICLOS PARA EXCEPCIÓN
+        spinnerCiclosExcepcion = new JSpinner(new SpinnerNumberModel(5, 1, 20, 1));
+        panelConfiguracion.add(new JLabel("Ciclos para excepción E/S:"));
+        panelConfiguracion.add(spinnerCiclosExcepcion);
+        
+        // CICLOS PARA SATISFACER
+        spinnerCiclosSatisfaccion = new JSpinner(new SpinnerNumberModel(3, 1, 10, 1));
+        panelConfiguracion.add(new JLabel("Ciclos para satisfacer E/S:"));
+        panelConfiguracion.add(spinnerCiclosSatisfaccion);
+        
+        // BOTÓN PARA APLICAR CONFIGURACIÓN
+        JButton btnAplicarConfig = new JButton("Aplicar Configuración");
+        btnAplicarConfig.addActionListener(e -> aplicarConfiguracion());
+        panelConfiguracion.add(btnAplicarConfig);
+    }
+    
+    private void organizarPaneles() {
+        // ORGANIZAR PANELES EN PESTAÑAS
+        JTabbedPane tabbedPane = new JTabbedPane();
+        
+        // PANEL DE SIMULACIÓN (CPU + COLAS)
+        JPanel panelSimulacion = new JPanel(new GridLayout(1, 2));
+        panelSimulacion.add(panelCPU);
+        panelSimulacion.add(panelColas);
+        
+        tabbedPane.addTab("Simulación", panelSimulacion);
+        tabbedPane.addTab("Configuración", panelConfiguracion);
+        tabbedPane.addTab("Métricas", panelMetricas);
+        
+        panelPrincipal.add(panelControl, BorderLayout.NORTH);
+        panelPrincipal.add(tabbedPane, BorderLayout.CENTER);
+        
+        add(panelPrincipal);
     }
     
     private void configurarVentana() {
-        setTitle("Simulador de Planificación - Sistemas Operativos");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(800, 600);
-        setLocationRelativeTo(null); // Centrar ventana
-    }
-    
-    private void iniciarSimulacion() {
-        if (!hiloSimulador.estaEjecutando()) {
-            hiloSimulador.start();
-            btnIniciar.setEnabled(false);
-            btnPausar.setEnabled(true);
-            
-            // Hilo para actualizar interfaz en tiempo real
-            new Thread(() -> {
-                while (hiloSimulador.estaEjecutando()) {
-                    actualizarInterfaz();
-                    try {
-                        Thread.sleep(500); // Actualizar cada 500ms
-                    } catch (InterruptedException e) {
-                        break;
-                    }
+        // TIMER PARA ACTUALIZACIÓN AUTOMÁTICA
+        Timer timerActualizacion = new Timer(500, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (controlador.isSimulacionActiva()) {
+                    actualizarVista();
                 }
-            }).start();
+            }
+        });
+        timerActualizacion.start();
+        
+        setVisible(true);
+    }
+    
+    private void configurarEventos() {
+        btnIniciar.addActionListener(e -> controlador.iniciarSimulacion());
+        btnPausar.addActionListener(e -> controlador.pausarSimulacion());
+        btnReanudar.addActionListener(e -> controlador.reanudarSimulacion());
+        btnDetener.addActionListener(e -> controlador.detenerSimulacion());
+        btnReiniciar.addActionListener(e -> controlador.reiniciarSimulacion());
+        
+        btnAgregarProceso.addActionListener(e -> mostrarDialogoAgregarProceso());
+        
+        comboPlanificadores.addActionListener(e -> {
+            String planificador = (String) comboPlanificadores.getSelectedItem();
+            controlador.cambiarPlanificador(planificador);
+        });
+    }
+    
+    private void aplicarConfiguracion() {
+        int duracionCiclo = (Integer) spinnerDuracionCiclo.getValue();
+        int quantum = (Integer) spinnerQuantum.getValue();
+        int ciclosExcepcion = (Integer) spinnerCiclosExcepcion.getValue();
+        int ciclosSatisfaccion = (Integer) spinnerCiclosSatisfaccion.getValue();
+        
+        controlador.configurarDuracionCiclo(duracionCiclo);
+        controlador.configurarQuantum(quantum);
+    }
+    
+    private void mostrarDialogoAgregarProceso() {
+        JOptionPane.showMessageDialog(this, 
+            "Funcionalidad de agregar proceso en desarrollo", 
+            "Información", 
+            JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    // MÉTODOS DE LA INTERFAZ VISTA
+    @Override
+    public void actualizarVista() {
+        if (!SwingUtilities.isEventDispatchThread()) {
+            SwingUtilities.invokeLater(() -> actualizarVista());
+            return;
+        }
+        
+        actualizarPanelControl();
+        actualizarPanelColas();
+        actualizarPanelCPU();
+    }
+    
+    @Override
+    public void actualizarMetricas() {
+        if (!SwingUtilities.isEventDispatchThread()) {
+            SwingUtilities.invokeLater(() -> actualizarMetricas());
+            return;
+        }
+        
+        Metricas metricas = controlador.getMetricas();
+        
+        if (lblThroughput != null) {
+            lblThroughput.setText(String.format("Throughput: %.4f procesos/ciclo", metricas.getThroughput()));
+            lblUtilizacionCPU.setText(String.format("Utilización CPU: %.2f%%", metricas.getUtilizacionCPU()));
+            lblTiempoRespuesta.setText(String.format("Tiempo respuesta promedio: %.2f ciclos", metricas.getTiempoRespuestaPromedio()));
+            lblProcesosCompletados.setText(String.format("Procesos completados: %d", metricas.getProcesosCompletados()));
+            lblCiclosTotales.setText(String.format("Ciclos totales: %d", metricas.getCiclosTotales()));
         }
     }
     
-    private void pausarSimulacion() {
-        if (hiloSimulador.estaEjecutando()) {
-            hiloSimulador.detener();
-            btnIniciar.setEnabled(true);
-            btnPausar.setEnabled(false);
-        }
+    private void actualizarPanelControl() {
+        if (btnIniciar == null) return;
+        
+        boolean simulacionActiva = controlador.isSimulacionActiva();
+        
+        btnIniciar.setEnabled(!simulacionActiva);
+        btnPausar.setEnabled(simulacionActiva && controlador.getHiloSimulador() != null && !controlador.getHiloSimulador().isPausado());
+        btnReanudar.setEnabled(simulacionActiva && controlador.getHiloSimulador() != null && controlador.getHiloSimulador().isPausado());
+        btnDetener.setEnabled(simulacionActiva);
+        btnReiniciar.setEnabled(true);
+        btnAgregarProceso.setEnabled(true);
+        
+        String estado = simulacionActiva ? 
+            (controlador.getHiloSimulador() != null && controlador.getHiloSimulador().isPausado() ? "Pausada" : "Ejecutándose") : 
+            "Detenida";
+        lblEstadoSimulacion.setText("Estado: " + estado);
+        lblPlanificadorActual.setText("Planificador: " + controlador.getGestorColas().getNombrePlanificadorActual());
     }
     
-    private void agregarProceso() {
-        // Por ahora agregamos un proceso de prueba
-        Proceso nuevo = new Proceso("P" + (gestorColas.getTotalProcesos() + 1), 
-                                   "Proceso Nuevo", 25, TipoProceso.CPU_BOUND);
-        gestorColas.agregarProceso(nuevo);
-        actualizarInterfaz();
+    private void actualizarPanelColas() {
+        if (areaListos == null) return;
+        
+        actualizarAreaCola(areaListos, controlador.getGestorColas().getColaListos());
+        actualizarAreaCola(areaBloqueados, controlador.getGestorColas().getColaBloqueados());
+        actualizarAreaCola(areaTerminados, controlador.getGestorColas().getColaTerminados());
+        actualizarAreaCola(areaListosSuspendidos, controlador.getGestorColas().getColaListosSuspendidos());
+        actualizarAreaCola(areaBloqueadosSuspendidos, controlador.getGestorColas().getColaBloqueadosSuspendidos());
     }
     
-    public void actualizarInterfaz() {
-        // Actualizar proceso en ejecución
-        Proceso enEjecucion = hiloSimulador.getProcesoEnEjecucion();
-        if (enEjecucion != null) {
-            lblProcesoEjecucion.setText("CPU: " + enEjecucion.getNombre() + 
-                                      " (" + enEjecucion.getInstruccionesEjecutadas() + 
-                                      "/" + enEjecucion.getTotalInstrucciones() + ")");
+    private void actualizarAreaCola(JTextArea area, ColaPCB cola) {
+        if (area == null) return;
+        
+        area.setText("");
+        if (cola != null && !cola.estaVacia()) {
+            PCB[] procesos = cola.toArray();
+            for (PCB pcb : procesos) {
+                area.append(pcb.toString() + "\n");
+            }
         } else {
-            lblProcesoEjecucion.setText("CPU: Libre");
+            area.setText("Vacía");
+        }
+    }
+    
+    private void actualizarPanelCPU() {
+        if (lblProcesoEjecutando == null) return;
+        
+        PCB procesoEjecutando = controlador.getHiloSimulador() != null ? 
+            controlador.getHiloSimulador().getProcesoEjecutando() : null;
+        GestorColas gestor = controlador.getGestorColas();
+        
+        if (procesoEjecutando != null) {
+            lblProcesoEjecutando.setText("Proceso ejecutando: " + procesoEjecutando.getNombre());
+            lblPC.setText("Program Counter: " + procesoEjecutando.getProgramCounter());
+            lblMAR.setText("Memory Address Register: " + procesoEjecutando.getMemoryAddressRegister());
+            lblInstrucciones.setText("Instrucciones: " + 
+                procesoEjecutando.getInstruccionesEjecutadas() + "/" + 
+                procesoEjecutando.getTotalInstrucciones());
+            
+            if (controlador.getGestorColas().getPlanificador() instanceof RoundRobinPlanificador) {
+                lblQuantum.setText("Quantum: " + controlador.getHiloSimulador().getContadorQuantum() + 
+                                 "/" + controlador.getHiloSimulador().getQuantum());
+            } else {
+                lblQuantum.setText("Quantum: No aplica");
+            }
+        } else {
+            lblProcesoEjecutando.setText("Proceso ejecutando: Ninguno");
+            lblPC.setText("Program Counter: 0");
+            lblMAR.setText("Memory Address Register: 0");
+            lblInstrucciones.setText("Instrucciones: 0/0");
+            lblQuantum.setText("Quantum: 0/0");
         }
         
-        // Actualizar ciclo global
-        lblCicloGlobal.setText("Ciclo: " + hiloSimulador.getCicloGlobal());
-        
-        // Actualizar cola de listos
-        List<Proceso> listos = gestorColas.getColaListos();
-        StringBuilder sbListos = new StringBuilder("COLA DE LISTOS:\n");
-        for (Proceso p : listos) {
-            sbListos.append("• ").append(p.toString()).append("\n");
-        }
-        txtColaListos.setText(sbListos.toString());
-        
-        // Actualizar cola de bloqueados
-        List<Proceso> bloqueados = gestorColas.getColaBloqueados();
-        StringBuilder sbBloqueados = new StringBuilder("COLA DE BLOQUEADOS:\n");
-        for (Proceso p : bloqueados) {
-            sbBloqueados.append("• ").append(p.toString()).append("\n");
-        }
-        txtColaBloqueados.setText(sbBloqueados.toString());
+        lblCicloActual.setText("Ciclo actual: " + gestor.getCicloActual());
     }
 }
