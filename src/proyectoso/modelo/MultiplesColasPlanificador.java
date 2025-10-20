@@ -4,57 +4,66 @@
  */
 package proyectoso.modelo;
 
-import java.util.List;
-import java.util.ArrayList;
-
 public class MultiplesColasPlanificador implements Planificador {
-    private List<List<Proceso>> colas;
-    private int[] quantums;
+    private ColaPCB colaAltaPrioridad;  // Para procesos interactivos (IO_BOUND)
+    private ColaPCB colaBajaPrioridad;  // Para procesos batch (CPU_BOUND)
+    private int contadorAltaPrioridad;
     
     public MultiplesColasPlanificador() {
-        this.colas = new ArrayList<>();
-        this.colas.add(new ArrayList<>()); // Cola 0: Alta prioridad
-        this.colas.add(new ArrayList<>()); // Cola 1: Media prioridad  
-        this.colas.add(new ArrayList<>()); // Cola 2: Baja prioridad
-        
-        this.quantums = new int[]{2, 4, 8}; // Quantums por cola
+        this.colaAltaPrioridad = new ColaPCB();
+        this.colaBajaPrioridad = new ColaPCB();
+        this.contadorAltaPrioridad = 0;
     }
     
     @Override
-    public Proceso seleccionarSiguiente(List<Proceso> colaListos) {
-        // Clasificar procesos en colas según su tipo
-        clasificarProcesos(colaListos);
-        
-        // Buscar desde cola de mayor prioridad
-        for (int i = 0; i < colas.size(); i++) {
-            if (!colas.get(i).isEmpty()) {
-                return colas.get(i).get(0);
+    public PCB seleccionarSiguiente(ColaPCB colaListos) {
+        // En múltiples colas, ignoramos la cola de entrada y usamos nuestras propias colas
+        // Primero verificar cola de alta prioridad
+        if (!colaAltaPrioridad.estaVacia()) {
+            contadorAltaPrioridad++;
+            PCB seleccionado = colaAltaPrioridad.getPrimero();
+            
+            // Cada 3 procesos de alta prioridad, dar chance a baja prioridad
+            if (contadorAltaPrioridad >= 3 && !colaBajaPrioridad.estaVacia()) {
+                contadorAltaPrioridad = 0;
+                return colaBajaPrioridad.getPrimero();
             }
+            
+            return seleccionado;
+        }
+        
+        // Si no hay en alta prioridad, usar baja prioridad
+        if (!colaBajaPrioridad.estaVacia()) {
+            return colaBajaPrioridad.getPrimero();
         }
         
         return null;
     }
     
-    private void clasificarProcesos(List<Proceso> colaListos) {
-        // Reiniciar colas
-        for (List<Proceso> cola : colas) {
-            cola.clear();
+    // Método para agregar procesos a las colas apropiadas
+    public void agregarProceso(PCB pcb) {
+        if (pcb.getTipo() == TipoProceso.IO_BOUND) {
+            colaAltaPrioridad.agregar(pcb);
+        } else {
+            colaBajaPrioridad.agregar(pcb);
         }
-        
-        // Clasificar según tipo de proceso
-        for (Proceso proceso : colaListos) {
-            if (proceso.getTipo() == TipoProceso.IO_BOUND) {
-                colas.get(0).add(proceso); // Alta prioridad para I/O
-            } else if (proceso.getInstruccionesRestantes() <= 10) {
-                colas.get(1).add(proceso); // Media prioridad para trabajos cortos
-            } else {
-                colas.get(2).add(proceso); // Baja prioridad para trabajos largos
-            }
+    }
+    
+    // Método para remover proceso de cualquier cola
+    public void removerProceso(PCB pcb) {
+        if (colaAltaPrioridad.contiene(pcb)) {
+            colaAltaPrioridad.removerPCB(pcb);
+        } else if (colaBajaPrioridad.contiene(pcb)) {
+            colaBajaPrioridad.removerPCB(pcb);
         }
     }
     
     @Override
     public String getNombre() {
-        return "Planificador Múltiples Colas";
+        return "Múltiples Colas (IO_BOUND → CPU_BOUND)";
     }
+    
+    // Getters para la interfaz (mostrar ambas colas)
+    public ColaPCB getColaAltaPrioridad() { return colaAltaPrioridad; }
+    public ColaPCB getColaBajaPrioridad() { return colaBajaPrioridad; }
 }

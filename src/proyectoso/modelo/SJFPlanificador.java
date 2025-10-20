@@ -4,32 +4,25 @@
  */
 package proyectoso.modelo;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-
 public class SJFPlanificador implements Planificador {
     
     @Override
-    public Proceso seleccionarSiguiente(List<Proceso> colaListos) {
-        if (colaListos == null || colaListos.isEmpty()) {
+    public PCB seleccionarSiguiente(ColaPCB colaListos) {
+        if (colaListos == null || colaListos.estaVacia()) {
             return null;
         }
         
-        // SJF: Seleccionar el proceso con menor tiempo restante
-        Proceso menorProceso = null;
-        int menorInstrucciones = Integer.MAX_VALUE;
+        // SJF: Selecciona el proceso con menos instrucciones totales
+        PCB[] procesos = colaListos.toArray();
+        PCB seleccionado = procesos[0];
         
-        for (Proceso proceso : colaListos) {
-            int instruccionesRestantes = proceso.getInstruccionesRestantes();
-            if (instruccionesRestantes < menorInstrucciones) {
-                menorInstrucciones = instruccionesRestantes;
-                menorProceso = proceso;
+        for (PCB pcb : procesos) {
+            if (pcb.getTotalInstrucciones() < seleccionado.getTotalInstrucciones()) {
+                seleccionado = pcb;
             }
         }
         
-        return menorProceso;
+        return seleccionado;
     }
     
     @Override

@@ -4,46 +4,59 @@
  */
 package proyectoso.modelo;
 
-import java.util.List;
-
 public class PrioridadPlanificador implements Planificador {
-    // Clase interna para manejar prioridades
-    public static class ProcesoConPrioridad {
-        public Proceso proceso;
-        public int prioridad;
-        
-        public ProcesoConPrioridad(Proceso proceso, int prioridad) {
-            this.proceso = proceso;
-            this.prioridad = prioridad;
-        }
+    private boolean prioridadMayorPrimero; // true: mayor prioridad primero
+    
+    public PrioridadPlanificador(boolean prioridadMayorPrimero) {
+        this.prioridadMayorPrimero = prioridadMayorPrimero;
     }
     
     @Override
-    public Proceso seleccionarSiguiente(List<Proceso> colaListos) {
-        if (colaListos == null || colaListos.isEmpty()) {
+    public PCB seleccionarSiguiente(ColaPCB colaListos) {
+        if (colaListos == null || colaListos.estaVacia()) {
             return null;
         }
         
-        // Prioridad: Seleccionar el proceso con mayor prioridad (número menor = mayor prioridad)
-        // Por simplicidad, usamos el ID como prioridad (P1 > P2 > P3)
-        Proceso mayorPrioridad = colaListos.get(0);
+        // Asignar prioridades (para este ejemplo: IO_BOUND tiene mayor prioridad)
+        PCB[] procesos = colaListos.toArray();
+        PCB seleccionado = procesos[0];
         
-        for (Proceso proceso : colaListos) {
-            if (esMayorPrioridad(proceso, mayorPrioridad)) {
-                mayorPrioridad = proceso;
+        for (PCB pcb : procesos) {
+            int prioridadActual = calcularPrioridad(pcb);
+            int prioridadSeleccionado = calcularPrioridad(seleccionado);
+            
+            if (prioridadMayorPrimero) {
+                if (prioridadActual > prioridadSeleccionado) {
+                    seleccionado = pcb;
+                }
+            } else {
+                if (prioridadActual < prioridadSeleccionado) {
+                    seleccionado = pcb;
+                }
             }
         }
         
-        return mayorPrioridad;
+        return seleccionado;
     }
     
-    private boolean esMayorPrioridad(Proceso p1, Proceso p2) {
-        // Comparar por ID (P1 tiene mayor prioridad que P2)
-        return p1.getId().compareTo(p2.getId()) < 0;
+    private int calcularPrioridad(PCB pcb) {
+        // Prioridad basada en tipo de proceso y instrucciones restantes
+        int prioridad = 0;
+        
+        // IO_BOUND tiene mayor prioridad que CPU_BOUND
+        if (pcb.getTipo() == TipoProceso.IO_BOUND) {
+            prioridad += 10;
+        }
+        
+        // Menos instrucciones restantes = mayor prioridad
+        prioridad += (100 - pcb.getInstruccionesRestantes()) / 10;
+        
+        return prioridad;
     }
     
     @Override
     public String getNombre() {
-        return "Planificador por Prioridad";
+        return "Planificación por Prioridad (" + 
+               (prioridadMayorPrimero ? "Mayor Primero" : "Menor Primero") + ")";
     }
 }

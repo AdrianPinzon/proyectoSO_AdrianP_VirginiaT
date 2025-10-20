@@ -4,16 +4,9 @@
  */
 package proyectoso.modelo;
 
-import java.util.List;
-
 public class RoundRobinPlanificador implements Planificador {
     private int quantum;
     private int contadorQuantum;
-    
-    public RoundRobinPlanificador() {
-        this.quantum = 4; // Quantum por defecto: 4 ciclos
-        this.contadorQuantum = 0;
-    }
     
     public RoundRobinPlanificador(int quantum) {
         this.quantum = quantum;
@@ -21,23 +14,25 @@ public class RoundRobinPlanificador implements Planificador {
     }
     
     @Override
-    public Proceso seleccionarSiguiente(List<Proceso> colaListos) {
-        if (colaListos == null || colaListos.isEmpty()) {
+    public PCB seleccionarSiguiente(ColaPCB colaListos) {
+        if (colaListos == null || colaListos.estaVacia()) {
             return null;
         }
         
-        // Round Robin: Rotación circular con quantum
-        if (contadorQuantum >= quantum || contadorQuantum == 0) {
+        // Round Robin: selecciona el primero
+        PCB seleccionado = colaListos.getPrimero();
+        contadorQuantum++;
+        
+        // Si se acabó el quantum, rotar la cola
+        if (contadorQuantum >= quantum) {
             contadorQuantum = 0;
-            // Mover el primer proceso al final (rotación)
-            if (colaListos.size() > 1) {
-                Proceso primero = colaListos.remove(0);
-                colaListos.add(primero);
+            if (colaListos.getTamaño() > 1) {
+                PCB primero = colaListos.remover();
+                colaListos.agregar(primero);
             }
         }
         
-        contadorQuantum++;
-        return colaListos.get(0);
+        return seleccionado;
     }
     
     @Override
@@ -48,9 +43,5 @@ public class RoundRobinPlanificador implements Planificador {
     public void setQuantum(int quantum) {
         this.quantum = quantum;
         this.contadorQuantum = 0;
-    }
-    
-    public int getQuantum() {
-        return quantum;
     }
 }
