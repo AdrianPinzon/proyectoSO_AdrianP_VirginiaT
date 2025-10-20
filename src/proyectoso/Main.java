@@ -20,7 +20,7 @@ public class Main {
             new VentanaPrincipal(controlador);
             
             System.out.println("Simulador iniciado correctamente");
-            System.out.println("Universidad Metropolitana - Sistemas Operativos - Proyecto 1");
+            System.out.println("Universidad Metropolitana - Sistemas Operativos - Proyecto 1  - Adrian Pinzon y Virginia Torrealba");
             System.out.println("Trimestre: 2526-1");
             
         } catch (Exception e) {
