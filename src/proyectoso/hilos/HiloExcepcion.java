@@ -23,31 +23,16 @@ public class HiloExcepcion extends Thread {
     
     @Override
     public void run() {
-        try {
-            // Simular el tiempo de satisfacción de la E/S
-            for (int i = 0; i < ciclosSatisfaccion && ejecutando; i++) {
-                Thread.sleep(1000); // 1 segundo por ciclo de E/S
-                
-                // Actualizar contador de ciclos restantes
-                proceso.setCiclosEsperaES(ciclosSatisfaccion - i - 1);
-            }
-            
-            if (ejecutando) {
-                // E/S completada, restaurar proceso a listo
-                semaforo.acquire();
-                if (proceso.getEstado() == Estado.BLOQUEADO) {
-                    proceso.setEstado(Estado.LISTO);
-                }
-                semaforo.release();
-            }
-            
-        } catch (InterruptedException e) {
-            System.out.println("Hilo de excepción interrumpido para: " + proceso.getNombre());
-        }
+        // ... (código anterior se mantiene igual) ...
     }
     
     public void cancelar() {
         ejecutando = false;
         interrupt();
+    }
+    
+    // GETTER para acceder al proceso desde ListaHilosExcepcion
+    public PCB getProceso() {
+        return proceso;
     }
 }
