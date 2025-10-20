@@ -4,7 +4,7 @@
  */
 package proyectoso.modelo;
 
-public class SJFPlanificador implements Planificador {
+public class SRTNPlanificador implements Planificador {
     
     @Override
     public PCB seleccionarSiguiente(ColaPCB colaListos) {
@@ -12,12 +12,12 @@ public class SJFPlanificador implements Planificador {
             return null;
         }
         
-        // SJF: Selecciona el proceso con menos instrucciones totales
+        // SRTN: Selecciona el proceso con menor tiempo restante
         PCB[] procesos = colaListos.toArray();
         PCB seleccionado = procesos[0];
         
         for (PCB pcb : procesos) {
-            if (pcb.getTotalInstrucciones() < seleccionado.getTotalInstrucciones()) {
+            if (pcb.getInstruccionesRestantes() < seleccionado.getInstruccionesRestantes()) {
                 seleccionado = pcb;
             }
         }
@@ -27,6 +27,6 @@ public class SJFPlanificador implements Planificador {
     
     @Override
     public String getNombre() {
-        return "Shortest Job First (SJF)";
+        return "Shortest Remaining Time Next (SRTN)";
     }
 }

@@ -4,9 +4,8 @@
  */
 package proyectoso.modelo;
 
-import java.util.List;
-
 public interface Planificador {
-    Proceso seleccionarSiguiente(List<Proceso> colaListos);
+    // CAMBIO CRÍTICO: Usa ColaPCB en lugar de List<PCB>
+    PCB seleccionarSiguiente(ColaPCB colaListos);
     String getNombre();
 }

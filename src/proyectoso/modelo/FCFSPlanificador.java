@@ -4,17 +4,15 @@
  */
 package proyectoso.modelo;
 
-import java.util.List;
-
 public class FCFSPlanificador implements Planificador {
     
     @Override
-    public Proceso seleccionarSiguiente(List<Proceso> colaListos) {
-        if (colaListos == null || colaListos.isEmpty()) {
+    public PCB seleccionarSiguiente(ColaPCB colaListos) {
+        if (colaListos == null || colaListos.estaVacia()) {
             return null;
         }
         // FCFS: Simplemente el primero en la cola
-        return colaListos.get(0);
+        return colaListos.getPrimero();
     }
     
     @Override

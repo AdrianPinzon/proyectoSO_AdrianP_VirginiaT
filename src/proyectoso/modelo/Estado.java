@@ -5,5 +5,12 @@
 package proyectoso.modelo;
 
 public enum Estado {
-    NUEVO, LISTO, EJECUCION, BLOQUEADO, TERMINADO, SUSPENDIDO
+    NUEVO,
+    LISTO, 
+    EJECUCION,
+    BLOQUEADO,
+    TERMINADO,
+    SUSPENDIDO,       // REQUERIDO: para gestión de memoria
+    LISTO_SUSPENDIDO, // Opcional: para mayor claridad en colas
+    BLOQUEADO_SUSPENDIDO // Opcional: para mayor claridad
 }
