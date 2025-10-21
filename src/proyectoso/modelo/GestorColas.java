@@ -71,6 +71,9 @@ public class GestorColas {
         PCB siguiente = planificador.seleccionarSiguiente(colaListos);
         
         if (siguiente != null) {
+            // Lógica específica para múltiples colas
+            manejarMultiplesColas(siguiente);
+        
             // Remover de cola de listos
             colaListos.removerPCB(siguiente);
             siguiente.setEstado(Estado.EJECUCION);
@@ -146,6 +149,26 @@ public class GestorColas {
             aReactivar.setEstado(Estado.LISTO);
             aReactivar.setSuspendido(false);
             colaListos.agregar(aReactivar);
+        }
+    }
+    
+    /**
+    * Maneja la lógica específica para múltiples colas
+    */
+    private void manejarMultiplesColas(PCB procesoEjecutando) {
+        if (planificador instanceof MultiplesColasPlanificador) {
+           MultiplesColasPlanificador multiColas = (MultiplesColasPlanificador) planificador;
+
+           // Remover el proceso ejecutado de las colas internas
+           if (procesoEjecutando != null) {
+               multiColas.removerProceso(procesoEjecutando);
+            }
+
+           // Si el proceso terminó o se bloqueó, removerlo completamente
+           if (procesoEjecutando != null && 
+               (procesoEjecutando.estaTerminado() || procesoEjecutando.getEstado() == Estado.BLOQUEADO)) {
+               multiColas.removerProceso(procesoEjecutando);
+            }
         }
     }
     

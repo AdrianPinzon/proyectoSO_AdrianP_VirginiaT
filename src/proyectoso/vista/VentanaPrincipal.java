@@ -433,9 +433,22 @@ public class VentanaPrincipal extends JFrame implements Vista {
     }
     
     private void actualizarPanelColas() {
-        if (areaListos == null) return;
-        
-        actualizarAreaCola(areaListos, controlador.getGestorColas().getColaListos());
+    if (areaListos == null) return;
+    
+        // Lógica especial para múltiples colas
+        if (controlador.getGestorColas().getPlanificador() instanceof MultiplesColasPlanificador) {
+            MultiplesColasPlanificador multiColas = (MultiplesColasPlanificador) controlador.getGestorColas().getPlanificador();
+
+            areaListos.setText("=== COLA ALTA PRIORIDAD (IO_BOUND) ===\n");
+            actualizarAreaCola(areaListos, multiColas.getColaAltaPrioridad());
+
+            areaListos.append("\n=== COLA BAJA PRIORIDAD (CPU_BOUND) ===\n");
+            actualizarAreaCola(areaListos, multiColas.getColaBajaPrioridad());
+        } else {
+            // Comportamiento normal para otros planificadores
+            actualizarAreaCola(areaListos, controlador.getGestorColas().getColaListos());
+        }
+
         actualizarAreaCola(areaBloqueados, controlador.getGestorColas().getColaBloqueados());
         actualizarAreaCola(areaTerminados, controlador.getGestorColas().getColaTerminados());
         actualizarAreaCola(areaListosSuspendidos, controlador.getGestorColas().getColaListosSuspendidos());
