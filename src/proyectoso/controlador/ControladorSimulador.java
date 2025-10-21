@@ -228,8 +228,8 @@ public class ControladorSimulador {
     }
     
     public void onTickReloj(int ciclo) {
-        if (vista != null && ciclo % 5 == 0) {
-            vista.actualizarMetricas();
+        if (vista != null) {
+        vista.actualizarMetricas();
         }
     }
     

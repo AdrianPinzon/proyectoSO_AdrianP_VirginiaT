@@ -50,6 +50,10 @@ public class VentanaPrincipal extends JFrame implements Vista {
     private JLabel lblThroughput, lblUtilizacionCPU, lblTiempoRespuesta;
     private JLabel lblProcesosCompletados, lblCiclosTotales;
     
+    // GRÁFICA
+    private PanelGraficas panelGraficas;
+    private JTabbedPane tabbedPane;
+    
     public VentanaPrincipal(ControladorSimulador controlador) {
         this.controlador = controlador;
         this.controlador.setVista(this);
@@ -240,21 +244,25 @@ public class VentanaPrincipal extends JFrame implements Vista {
     }
     
     private void organizarPaneles() {
+        // Crear panel de gráficas
+        panelGraficas = new PanelGraficas();
+
         // ORGANIZAR PANELES EN PESTAÑAS
-        JTabbedPane tabbedPane = new JTabbedPane();
-        
+        tabbedPane = new JTabbedPane();
+
         // PANEL DE SIMULACIÓN (CPU + COLAS)
         JPanel panelSimulacion = new JPanel(new GridLayout(1, 2));
         panelSimulacion.add(panelCPU);
         panelSimulacion.add(panelColas);
-        
+
         tabbedPane.addTab("Simulación", panelSimulacion);
         tabbedPane.addTab("Configuración", panelConfiguracion);
         tabbedPane.addTab("Métricas", panelMetricas);
-        
+        tabbedPane.addTab("Gráficas", panelGraficas); // NUEVA PESTAÑA
+
         panelPrincipal.add(panelControl, BorderLayout.NORTH);
         panelPrincipal.add(tabbedPane, BorderLayout.CENTER);
-        
+
         add(panelPrincipal);
     }
     
@@ -388,15 +396,20 @@ public class VentanaPrincipal extends JFrame implements Vista {
             SwingUtilities.invokeLater(() -> actualizarMetricas());
             return;
         }
-        
+
         Metricas metricas = controlador.getMetricas();
-        
+
         if (lblThroughput != null) {
             lblThroughput.setText(String.format("Throughput: %.4f procesos/ciclo", metricas.getThroughput()));
             lblUtilizacionCPU.setText(String.format("Utilización CPU: %.2f%%", metricas.getUtilizacionCPU()));
             lblTiempoRespuesta.setText(String.format("Tiempo respuesta promedio: %.2f ciclos", metricas.getTiempoRespuestaPromedio()));
             lblProcesosCompletados.setText(String.format("Procesos completados: %d", metricas.getProcesosCompletados()));
             lblCiclosTotales.setText(String.format("Ciclos totales: %d", metricas.getCiclosTotales()));
+
+            // ACTUALIZAR GRÁFICAS
+            if (panelGraficas != null) {
+                panelGraficas.agregarMetricas(metricas);
+            }
         }
     }
     
@@ -474,4 +487,5 @@ public class VentanaPrincipal extends JFrame implements Vista {
         
         lblCicloActual.setText("Ciclo actual: " + gestor.getCicloActual());
     }
+    
 }
