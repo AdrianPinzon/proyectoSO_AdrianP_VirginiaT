@@ -299,10 +299,74 @@ public class VentanaPrincipal extends JFrame implements Vista {
     }
     
     private void mostrarDialogoAgregarProceso() {
-        JOptionPane.showMessageDialog(this, 
-            "Funcionalidad de agregar proceso en desarrollo", 
-            "Información", 
-            JOptionPane.INFORMATION_MESSAGE);
+    // Crear panel para el diálogo de agregar proceso
+    JPanel panel = new JPanel(new GridLayout(3, 2, 10, 10));
+    
+    // Campos del formulario
+    JTextField txtNombre = new JTextField("Proceso" + (System.currentTimeMillis() % 1000));
+    JTextField txtInstrucciones = new JTextField("30");
+    JComboBox<TipoProceso> comboTipo = new JComboBox<>(TipoProceso.values());
+    
+    // Agregar componentes al panel
+    panel.add(new JLabel("Nombre:"));
+    panel.add(txtNombre);
+    panel.add(new JLabel("Total Instrucciones:"));
+    panel.add(txtInstrucciones);
+    panel.add(new JLabel("Tipo:"));
+    panel.add(comboTipo);
+    
+    // Mostrar diálogo
+    int result = JOptionPane.showConfirmDialog(
+        this, 
+        panel, 
+        "Agregar Nuevo Proceso", 
+        JOptionPane.OK_CANCEL_OPTION, 
+        JOptionPane.PLAIN_MESSAGE
+    );
+    
+    // Si el usuario hizo clic en OK
+    if (result == JOptionPane.OK_OPTION) {
+        try {
+            String nombre = txtNombre.getText().trim();
+            int totalInstrucciones = Integer.parseInt(txtInstrucciones.getText().trim());
+            TipoProceso tipo = (TipoProceso) comboTipo.getSelectedItem();
+            
+            // Validaciones
+            if (nombre.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "El nombre no puede estar vacío", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            if (totalInstrucciones <= 0) {
+                JOptionPane.showMessageDialog(this, "El total de instrucciones debe ser mayor a 0", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            // Agregar el proceso al controlador
+            controlador.agregarProceso(nombre, totalInstrucciones, tipo);
+            
+            // Actualizar la vista para mostrar el nuevo proceso en la cola
+            actualizarVista();
+            
+            JOptionPane.showMessageDialog(this, 
+                "Proceso '" + nombre + "' agregado exitosamente!\n" +
+                "Instrucciones: " + totalInstrucciones + "\n" +
+                "Tipo: " + tipo, 
+                "Proceso Agregado", 
+                JOptionPane.INFORMATION_MESSAGE);
+            
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, 
+                "Por favor ingresa un número válido para las instrucciones", 
+                "Error", 
+                JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, 
+                "Error al agregar proceso: " + e.getMessage(), 
+                "Error", 
+                JOptionPane.ERROR_MESSAGE);
+        }
+    }
     }
     
     // MÉTODOS DE LA INTERFAZ VISTA
