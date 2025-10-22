@@ -50,6 +50,10 @@ public class VentanaPrincipal extends JFrame implements Vista {
     private JLabel lblThroughput, lblUtilizacionCPU, lblTiempoRespuesta;
     private JLabel lblProcesosCompletados, lblCiclosTotales;
     
+    // GRÁFICA
+    private PanelGraficas panelGraficas;
+    private JTabbedPane tabbedPane;
+    
     public VentanaPrincipal(ControladorSimulador controlador) {
         this.controlador = controlador;
         this.controlador.setVista(this);
@@ -240,21 +244,25 @@ public class VentanaPrincipal extends JFrame implements Vista {
     }
     
     private void organizarPaneles() {
+        // Crear panel de gráficas
+        panelGraficas = new PanelGraficas();
+
         // ORGANIZAR PANELES EN PESTAÑAS
-        JTabbedPane tabbedPane = new JTabbedPane();
-        
+        tabbedPane = new JTabbedPane();
+
         // PANEL DE SIMULACIÓN (CPU + COLAS)
         JPanel panelSimulacion = new JPanel(new GridLayout(1, 2));
         panelSimulacion.add(panelCPU);
         panelSimulacion.add(panelColas);
-        
+
         tabbedPane.addTab("Simulación", panelSimulacion);
         tabbedPane.addTab("Configuración", panelConfiguracion);
         tabbedPane.addTab("Métricas", panelMetricas);
-        
+        tabbedPane.addTab("Gráficas", panelGraficas); // NUEVA PESTAÑA
+
         panelPrincipal.add(panelControl, BorderLayout.NORTH);
         panelPrincipal.add(tabbedPane, BorderLayout.CENTER);
-        
+
         add(panelPrincipal);
     }
     
@@ -299,10 +307,74 @@ public class VentanaPrincipal extends JFrame implements Vista {
     }
     
     private void mostrarDialogoAgregarProceso() {
-        JOptionPane.showMessageDialog(this, 
-            "Funcionalidad de agregar proceso en desarrollo", 
-            "Información", 
-            JOptionPane.INFORMATION_MESSAGE);
+    // Crear panel para el diálogo de agregar proceso
+    JPanel panel = new JPanel(new GridLayout(3, 2, 10, 10));
+    
+    // Campos del formulario
+    JTextField txtNombre = new JTextField("Proceso" + (System.currentTimeMillis() % 1000));
+    JTextField txtInstrucciones = new JTextField("30");
+    JComboBox<TipoProceso> comboTipo = new JComboBox<>(TipoProceso.values());
+    
+    // Agregar componentes al panel
+    panel.add(new JLabel("Nombre:"));
+    panel.add(txtNombre);
+    panel.add(new JLabel("Total Instrucciones:"));
+    panel.add(txtInstrucciones);
+    panel.add(new JLabel("Tipo:"));
+    panel.add(comboTipo);
+    
+    // Mostrar diálogo
+    int result = JOptionPane.showConfirmDialog(
+        this, 
+        panel, 
+        "Agregar Nuevo Proceso", 
+        JOptionPane.OK_CANCEL_OPTION, 
+        JOptionPane.PLAIN_MESSAGE
+    );
+    
+    // Si el usuario hizo clic en OK
+    if (result == JOptionPane.OK_OPTION) {
+        try {
+            String nombre = txtNombre.getText().trim();
+            int totalInstrucciones = Integer.parseInt(txtInstrucciones.getText().trim());
+            TipoProceso tipo = (TipoProceso) comboTipo.getSelectedItem();
+            
+            // Validaciones
+            if (nombre.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "El nombre no puede estar vacío", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            if (totalInstrucciones <= 0) {
+                JOptionPane.showMessageDialog(this, "El total de instrucciones debe ser mayor a 0", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            // Agregar el proceso al controlador
+            controlador.agregarProceso(nombre, totalInstrucciones, tipo);
+            
+            // Actualizar la vista para mostrar el nuevo proceso en la cola
+            actualizarVista();
+            
+            JOptionPane.showMessageDialog(this, 
+                "Proceso '" + nombre + "' agregado exitosamente!\n" +
+                "Instrucciones: " + totalInstrucciones + "\n" +
+                "Tipo: " + tipo, 
+                "Proceso Agregado", 
+                JOptionPane.INFORMATION_MESSAGE);
+            
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, 
+                "Por favor ingresa un número válido para las instrucciones", 
+                "Error", 
+                JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, 
+                "Error al agregar proceso: " + e.getMessage(), 
+                "Error", 
+                JOptionPane.ERROR_MESSAGE);
+        }
+    }
     }
     
     // MÉTODOS DE LA INTERFAZ VISTA
@@ -324,15 +396,20 @@ public class VentanaPrincipal extends JFrame implements Vista {
             SwingUtilities.invokeLater(() -> actualizarMetricas());
             return;
         }
-        
+
         Metricas metricas = controlador.getMetricas();
-        
+
         if (lblThroughput != null) {
             lblThroughput.setText(String.format("Throughput: %.4f procesos/ciclo", metricas.getThroughput()));
             lblUtilizacionCPU.setText(String.format("Utilización CPU: %.2f%%", metricas.getUtilizacionCPU()));
             lblTiempoRespuesta.setText(String.format("Tiempo respuesta promedio: %.2f ciclos", metricas.getTiempoRespuestaPromedio()));
             lblProcesosCompletados.setText(String.format("Procesos completados: %d", metricas.getProcesosCompletados()));
             lblCiclosTotales.setText(String.format("Ciclos totales: %d", metricas.getCiclosTotales()));
+
+            // ACTUALIZAR GRÁFICAS
+            if (panelGraficas != null) {
+                panelGraficas.agregarMetricas(metricas);
+            }
         }
     }
     
@@ -356,9 +433,22 @@ public class VentanaPrincipal extends JFrame implements Vista {
     }
     
     private void actualizarPanelColas() {
-        if (areaListos == null) return;
-        
-        actualizarAreaCola(areaListos, controlador.getGestorColas().getColaListos());
+    if (areaListos == null) return;
+    
+        // Lógica especial para múltiples colas
+        if (controlador.getGestorColas().getPlanificador() instanceof MultiplesColasPlanificador) {
+            MultiplesColasPlanificador multiColas = (MultiplesColasPlanificador) controlador.getGestorColas().getPlanificador();
+
+            areaListos.setText("=== COLA ALTA PRIORIDAD (IO_BOUND) ===\n");
+            actualizarAreaCola(areaListos, multiColas.getColaAltaPrioridad());
+
+            areaListos.append("\n=== COLA BAJA PRIORIDAD (CPU_BOUND) ===\n");
+            actualizarAreaCola(areaListos, multiColas.getColaBajaPrioridad());
+        } else {
+            // Comportamiento normal para otros planificadores
+            actualizarAreaCola(areaListos, controlador.getGestorColas().getColaListos());
+        }
+
         actualizarAreaCola(areaBloqueados, controlador.getGestorColas().getColaBloqueados());
         actualizarAreaCola(areaTerminados, controlador.getGestorColas().getColaTerminados());
         actualizarAreaCola(areaListosSuspendidos, controlador.getGestorColas().getColaListosSuspendidos());
@@ -410,4 +500,5 @@ public class VentanaPrincipal extends JFrame implements Vista {
         
         lblCicloActual.setText("Ciclo actual: " + gestor.getCicloActual());
     }
+    
 }
