@@ -293,6 +293,7 @@ public class VentanaPrincipal extends JFrame implements Vista {
         comboPlanificadores.addActionListener(e -> {
             String planificador = (String) comboPlanificadores.getSelectedItem();
             controlador.cambiarPlanificador(planificador);
+            actualizarPanelControl();
         });
     }
     

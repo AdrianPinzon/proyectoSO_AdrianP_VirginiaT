@@ -144,15 +144,19 @@ public class ControladorSimulador {
         try {
             Planificador nuevoPlanificador = crearPlanificador(tipoPlanificador);
             gestorColas.setPlanificador(nuevoPlanificador);
-            
-            // Configurar quantum si es Round Robin
+
+            // Configurar quantum si es Round Robin (solo la configuración específica)
             if (nuevoPlanificador instanceof RoundRobinPlanificador) {
-                ((RoundRobinPlanificador) nuevoPlanificador).setQuantum(configuracion.getQuantum());
-                hiloSimulador.setQuantum(configuracion.getQuantum());
+                 // Esta sección SÓLO debe contener la lógica específica de Round Robin
+                 ((RoundRobinPlanificador) nuevoPlanificador).setQuantum(configuracion.getQuantum());
+                 hiloSimulador.setQuantum(configuracion.getQuantum());
             }
-            
+
             logger.log("Planificador cambiado a: " + nuevoPlanificador.getNombre());
-            
+
+            // 👈 LÍNEA CRÍTICA: La actualización debe ejecutarse SIEMPRE
+            actualizarVista(); 
+
         } catch (Exception e) {
             logger.log("Error al cambiar planificador: " + e.getMessage());
         }
