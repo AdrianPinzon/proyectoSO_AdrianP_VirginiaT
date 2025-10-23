@@ -14,7 +14,7 @@ public class HiloExcepcion extends Thread {
     private GestorColas gestorColas; // 👈 Referencia al coordinador
     private volatile boolean ejecutando;
     
-    public HiloExcepcion(PCB proceso, int ciclosSatisfaccion, GestorColas aThis) {
+    public HiloExcepcion(PCB proceso, int ciclosSatisfaccion, GestorColas gestorColas) {
         this.proceso = proceso;
         this.ciclosSatisfaccion = ciclosSatisfaccion;
         this.gestorColas = gestorColas; // 👈 Referencia
