@@ -90,38 +90,68 @@ public class HiloSimulador extends Thread {
      */
     private void manejarProcesoActual() {
         if (procesoEjecutando == null) return;
-        
+
         // Verificar si el proceso terminó
         if (procesoEjecutando.estaTerminado()) {
             gestorColas.terminarProceso(procesoEjecutando);
+
+            // Remover de colas de feedback si es FB
+            if (gestorColas.getPlanificador() instanceof FBPlanificador) {
+                ((FBPlanificador) gestorColas.getPlanificador()).removerProceso(procesoEjecutando);
+            }
+
             procesoEjecutando = null;
             contadorQuantum = 0;
             return;
         }
-        
+
         // Ejecutar un ciclo del proceso
         procesoEjecutando.ejecutarCiclo();
-        
+
         // Verificar si generó excepción E/S
         if (procesoEjecutando.getEstado() == Estado.BLOQUEADO) {
             gestorColas.bloquearProceso(procesoEjecutando);
+
+            // Remover de colas de feedback si es FB
+            if (gestorColas.getPlanificador() instanceof FBPlanificador) {
+                ((FBPlanificador) gestorColas.getPlanificador()).removerProceso(procesoEjecutando);
+            }
+
             procesoEjecutando = null;
             contadorQuantum = 0;
             return;
         }
-        
-        // Manejar quantum para Round Robin
+
+        // Manejar quantum
+        contadorQuantum++;
+        int quantumMaximo = 0;
+
+        // Obtener quantum según el planificador
         if (gestorColas.getPlanificador() instanceof RoundRobinPlanificador) {
-            contadorQuantum++;
-            if (contadorQuantum >= quantumActual) {
-                // Quantum agotado, volver a cola de listos
-                if (procesoEjecutando != null && !procesoEjecutando.estaTerminado()) {
-                    procesoEjecutando.setEstado(Estado.LISTO);
+            quantumMaximo = this.quantumActual;
+        } else if (gestorColas.getPlanificador() instanceof FBPlanificador) {
+            quantumMaximo = ((FBPlanificador) gestorColas.getPlanificador()).getQuantum(procesoEjecutando);
+        } else {
+            // Para otros planificadores, usar quantum por defecto
+            quantumMaximo = 9999; // Muy alto para que no expire
+        }
+
+        if (contadorQuantum >= quantumMaximo) {
+            // Quantum agotado
+            if (procesoEjecutando != null && !procesoEjecutando.estaTerminado()) {
+                procesoEjecutando.setEstado(Estado.LISTO);
+
+                // Lógica específica para FB: mover a siguiente cola
+                if (gestorColas.getPlanificador() instanceof FBPlanificador) {
+                    ((FBPlanificador) gestorColas.getPlanificador()).procesoExpulsado(procesoEjecutando);
+                } else {
+                    // Para otros planificadores, volver a cola normal
                     gestorColas.getColaListos().agregar(procesoEjecutando);
-                    procesoEjecutando = null;
                 }
-                contadorQuantum = 0;
+
+                procesoEjecutando = null;
             }
+            contadorQuantum = 0;
         }
     }
     

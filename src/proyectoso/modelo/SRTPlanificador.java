@@ -4,29 +4,26 @@
  */
 package proyectoso.modelo;
 
-public class SRTNPlanificador implements Planificador {
+public class SRTPlanificador implements Planificador {
     
     @Override
-    public PCB seleccionarSiguiente(ColaPCB colaListos) {
-        if (colaListos == null || colaListos.estaVacia()) {
-            return null;
-        }
-        
-        // SRTN: Selecciona el proceso con menor tiempo restante
+    public PCB seleccionarSiguiente(ColaPCB colaListos, int cicloActual) {
+        // ... (verificaciones de cola vacía) ...
+
         PCB[] procesos = colaListos.toArray();
         PCB seleccionado = procesos[0];
-        
+
+        // Busca el proceso con el menor tiempo RESTANTE de servicio
         for (PCB pcb : procesos) {
-            if (pcb.getInstruccionesRestantes() < seleccionado.getInstruccionesRestantes()) {
+            if (pcb.getInstruccionesRestantes() < seleccionado.getInstruccionesRestantes()) { // 👈 CRITERIO CLAVE
                 seleccionado = pcb;
             }
         }
-        
         return seleccionado;
     }
-    
+
     @Override
     public String getNombre() {
-        return "Shortest Remaining Time Next (SRTN)";
+        return "Shortest Remaining Time (SRT)";
     }
 }

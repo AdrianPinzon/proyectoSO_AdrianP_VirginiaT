@@ -163,19 +163,19 @@ public class ControladorSimulador {
             case "FCFS":
                 return new FCFSPlanificador();
             case "SJF":
-                return new SJFPlanificador();
+                return new SPNPlanificador();
             case "SRTN":
-                return new SRTNPlanificador();
+                return new SRTPlanificador();
             case "ROUNDROBIN":
                 RoundRobinPlanificador rr = new RoundRobinPlanificador(configuracion.getQuantum());
                 hiloSimulador.setQuantum(configuracion.getQuantum());
                 return rr;
             case "PRIORIDAD":
-                return new PrioridadPlanificador(true);
-            case "MULTIPLESCOLAS":
-                return new MultiplesColasPlanificador();
-            default:
-                return new FCFSPlanificador();
+                return new HRRNPlanificador(true);
+            case "FEEDBACK":  
+            return new FBPlanificador();
+        default:
+            return new FCFSPlanificador();
         }
     }
     

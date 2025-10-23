@@ -14,7 +14,7 @@ public class RoundRobinPlanificador implements Planificador {
     }
     
     @Override
-    public PCB seleccionarSiguiente(ColaPCB colaListos) {
+    public PCB seleccionarSiguiente(ColaPCB colaListos, int cicloActual) {
         if (colaListos == null || colaListos.estaVacia()) {
             return null;
         }

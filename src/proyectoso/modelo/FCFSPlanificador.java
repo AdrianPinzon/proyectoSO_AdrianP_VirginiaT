@@ -7,16 +7,14 @@ package proyectoso.modelo;
 public class FCFSPlanificador implements Planificador {
     
     @Override
-    public PCB seleccionarSiguiente(ColaPCB colaListos) {
+    public PCB seleccionarSiguiente(ColaPCB colaListos, int cicloActual) { // 👈 AGREGAR int cicloActual
         if (colaListos == null || colaListos.estaVacia()) {
             return null;
         }
-        // FCFS: Simplemente el primero en la cola
         return colaListos.getPrimero();
     }
-    
     @Override
     public String getNombre() {
-        return "First-Come, First-Served (FCFS)";
-    }
+    return "First-Come, First-Served (FCFS)";
+}
 }

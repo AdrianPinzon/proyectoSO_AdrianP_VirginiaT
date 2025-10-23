@@ -107,7 +107,7 @@ public class VentanaPrincipal extends JFrame implements Vista {
         
         // COMBO BOX DE PLANIFICADORES
         comboPlanificadores = new JComboBox<>(new String[]{
-            "FCFS", "SJF", "SRTN", "ROUNDROBIN", "PRIORIDAD", "MULTIPLESCOLAS"
+            "FCFS", "SPN", "SRT", "ROUNDROBIN", "HRRN", "FB"
         });
         
         // ETIQUETAS DE ESTADO
@@ -433,22 +433,38 @@ public class VentanaPrincipal extends JFrame implements Vista {
     }
     
     private void actualizarPanelColas() {
-    if (areaListos == null) return;
-    
-        // Lógica especial para múltiples colas
-        if (controlador.getGestorColas().getPlanificador() instanceof MultiplesColasPlanificador) {
-            MultiplesColasPlanificador multiColas = (MultiplesColasPlanificador) controlador.getGestorColas().getPlanificador();
+        if (areaListos == null) return;
 
-            areaListos.setText("=== COLA ALTA PRIORIDAD (IO_BOUND) ===\n");
-            actualizarAreaCola(areaListos, multiColas.getColaAltaPrioridad());
+        // LIMPIAR TODAS LAS ÁREAS PRIMERO
+        areaListos.setText("");
+        areaBloqueados.setText("");
+        areaTerminados.setText("");
+        areaListosSuspendidos.setText("");
+        areaBloqueadosSuspendidos.setText("");
 
-            areaListos.append("\n=== COLA BAJA PRIORIDAD (CPU_BOUND) ===\n");
-            actualizarAreaCola(areaListos, multiColas.getColaBajaPrioridad());
+        // LÓGICA ESPECIAL PARA FEEDBACK (FB)
+        if (controlador.getGestorColas().getPlanificador() instanceof FBPlanificador) {
+            FBPlanificador fb = (FBPlanificador) controlador.getGestorColas().getPlanificador();
+
+            for (int i = 0; i < fb.getNumeroColas(); i++) {
+                areaListos.append("=== COLA " + i + " (Quantum: " + fb.getQuantum(i) + ") ===\n");
+                if (fb.getCola(i) != null && !fb.getCola(i).estaVacia()) {
+                    PCB[] procesos = fb.getCola(i).toArray();
+                    for (PCB pcb : procesos) {
+                        areaListos.append(pcb.toString() + "\n");
+                    }
+                } else {
+                    areaListos.append("Vacía\n");
+                }
+                areaListos.append("\n");
+            }
+
         } else {
-            // Comportamiento normal para otros planificadores
+            // COMPORTAMIENTO NORMAL PARA OTROS PLANIFICADORES
             actualizarAreaCola(areaListos, controlador.getGestorColas().getColaListos());
         }
 
+        // LAS OTRAS COLAS SIEMPRE SE MUESTRAN NORMAL
         actualizarAreaCola(areaBloqueados, controlador.getGestorColas().getColaBloqueados());
         actualizarAreaCola(areaTerminados, controlador.getGestorColas().getColaTerminados());
         actualizarAreaCola(areaListosSuspendidos, controlador.getGestorColas().getColaListosSuspendidos());
