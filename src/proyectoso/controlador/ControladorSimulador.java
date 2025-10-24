@@ -145,10 +145,19 @@ public class ControladorSimulador {
             Planificador nuevoPlanificador = crearPlanificador(tipoPlanificador);
             gestorColas.setPlanificador(nuevoPlanificador);
 
-            // Configurar quantum si es Round Robin (solo la configuración específica)
-            if (nuevoPlanificador instanceof RoundRobinPlanificador) {
-                 // Esta sección SÓLO debe contener la lógica específica de Round Robin
-                 ((RoundRobinPlanificador) nuevoPlanificador).setQuantum(configuracion.getQuantum());
+            // 👈 VERIFICACIÓN DE NULIDAD CRÍTICA
+            if (nuevoPlanificador == null) {
+                logger.log("Error: El planificador '" + tipoPlanificador + "' no pudo ser creado.");
+                actualizarVista();
+                return; // Sale del método si es nulo.
+            }
+
+            // 1. CONFIGURACIÓN DEL MODELO: Asignar el nuevo planificador
+            gestorColas.setPlanificador(nuevoPlanificador);
+
+            // 2. LÓGICA CONDICIONAL: Ya es segura porque nuevoPlanificador no es null
+            if (nuevoPlanificador instanceof RoundRobinPlanificador roundRobinPlanificador) { 
+                 roundRobinPlanificador.setQuantum(configuracion.getQuantum());
                  hiloSimulador.setQuantum(configuracion.getQuantum());
             }
 
@@ -166,17 +175,17 @@ public class ControladorSimulador {
         switch (tipo.toUpperCase()) {
             case "FCFS":
                 return new FCFSPlanificador();
-            case "SJF":
+            case "SPN":
                 return new SPNPlanificador();
-            case "SRTN":
+            case "SRT":
                 return new SRTPlanificador();
             case "ROUNDROBIN":
                 RoundRobinPlanificador rr = new RoundRobinPlanificador(configuracion.getQuantum());
                 hiloSimulador.setQuantum(configuracion.getQuantum());
                 return rr;
-            case "PRIORIDAD":
+            case "HRRN":
                 return new HRRNPlanificador(true);
-            case "FEEDBACK":  
+            case "FB":  
             return new FBPlanificador();
         default:
             return new FCFSPlanificador();
