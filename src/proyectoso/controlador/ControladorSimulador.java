@@ -131,8 +131,24 @@ public class ControladorSimulador {
             // Agregar al gestor
             gestorColas.agregarProceso(nuevoProceso);
             
+            // 👈 LÓGICA DE DISTRIBUCIÓN FB MEJORADA
+            // La distribución debe ocurrir si la simulación NO está activa O si está pausada.
+            if (gestorColas.getPlanificador() instanceof FBPlanificador) {
+
+                boolean simulaciónPuedeDistribuir = 
+                    !this.simulacionActiva || // Si está Detenida
+                    (this.simulacionActiva && hiloSimulador.isPausado()); // O si está Pausada
+
+                if (simulaciónPuedeDistribuir) {
+                    FBPlanificador fb = (FBPlanificador) gestorColas.getPlanificador();
+                    // Llamar al método de distribución
+                    fb.distribuirProcesosNuevos(gestorColas.getColaListos()); 
+                }
+            }
+
             logger.log("Nuevo proceso creado: " + nuevoProceso.toString());
-            
+            actualizarVista();
+
         } catch (Exception e) {
             logger.log("Error al crear proceso: " + e.getMessage());
         }

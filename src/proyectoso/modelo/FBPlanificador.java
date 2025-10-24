@@ -43,21 +43,30 @@ public class FBPlanificador implements Planificador {
     /**
      * Distribuye procesos nuevos en la cola de mayor prioridad
      */
-    private void distribuirProcesosNuevos(ColaPCB colaListosExterna) {
+    public void distribuirProcesosNuevos(ColaPCB colaListosExterna) {
         if (colaListosExterna == null || colaListosExterna.estaVacia()) {
             return;
         }
-        
-        PCB[] procesosExternos = colaListosExterna.toArray();
-        
-        for (PCB pcb : procesosExternos) {
-            // Si el proceso no está en ninguna cola de feedback, agregarlo a la cola 0
+
+        // Iteramos y removemos procesos de la cola externa
+        ColaPCB temp = new ColaPCB();
+        PCB pcb;
+
+        // 1. Mover todos los procesos de la cola externa a una cola temporal
+        // Esto es necesario porque FB asume el control total de la cola de listos.
+        while ((pcb = colaListosExterna.remover()) != null) {
+            temp.agregar(pcb);
+        }
+
+        // 2. Distribuir desde la cola temporal a la Cola 0 interna
+        while ((pcb = temp.remover()) != null) {
+            // Asumiendo que estaEnColasFeedback(pcb) siempre será falso para nuevos procesos
             if (!estaEnColasFeedback(pcb)) {
-                colas[0].agregar(pcb);
+                colas[0].agregar(pcb); // Añadir a la cola de mayor prioridad
             }
         }
     }
-    
+
     /**
      * Verifica si un proceso está en alguna cola de feedback
      */
