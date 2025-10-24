@@ -4,6 +4,15 @@
  */
 package proyectoso.modelo;
 
+/*
+/**
+ * Feedback de Planificación
+ * Utiliza 3 colas de prioridad
+ * donde las colas de mayor prioridad tienen un quantum más corto y las de menor 
+ * prioridad tienen un quantum más largo. Un proceso que agota su quantum es 
+ * "expulsado" a la siguiente cola de menor prioridad.
+*/
+
 public class FBPlanificador implements Planificador {
     private ColaPCB[] colas;
     private int[] quantums;
@@ -151,7 +160,8 @@ public class FBPlanificador implements Planificador {
         }
         return 0;
     }
-    
+
+    // Total de colas de prioridad
     public int getNumeroColas() {
         return numeroColas;
     }
