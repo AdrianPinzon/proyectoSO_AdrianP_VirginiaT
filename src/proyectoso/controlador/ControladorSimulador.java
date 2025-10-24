@@ -9,6 +9,11 @@ import proyectoso.hilos.*;
 import proyectoso.util.*;
 import proyectoso.vista.Vista; 
 
+/*
+ * Gestiona la interacción entre el Modelo y la Vista
+ * Tiene ejecución concurrente a través de 
+ * los hilos de simulación 
+ */
 
 public class ControladorSimulador {
     // MODELO
