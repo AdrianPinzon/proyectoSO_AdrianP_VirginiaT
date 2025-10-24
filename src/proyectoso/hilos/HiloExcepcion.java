@@ -8,6 +8,13 @@ import proyectoso.modelo.PCB;
 import proyectoso.modelo.GestorColas;
 import proyectoso.modelo.Estado;
 
+/*
+ * Representa un hilo auxiliar encargado de simular el tiempo que un proceso 
+ * pasa esperando que se complete una operación de Entrada/Salida (E/S) o una interrupción.
+ * Este hilo saca el proceso de la cola de espera y una vez finalizado el tiempo
+ * de simulado, notifica para que el proceso regrese a la cola de listos.
+*/
+
 public class HiloExcepcion extends Thread {
     private PCB proceso;
     private int ciclosSatisfaccion;
