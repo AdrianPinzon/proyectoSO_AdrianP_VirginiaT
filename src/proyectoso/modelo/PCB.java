@@ -4,6 +4,7 @@
  */
 package proyectoso.modelo;
 
+
 public class PCB {
     // Atributos de identificación
     private String id;
@@ -80,21 +81,10 @@ public class PCB {
     public void setCiclosParaExcepcion(int ciclos) { this.ciclosParaExcepcion = ciclos; }
     public void setCiclosParaSatisfacer(int ciclos) { this.ciclosParaSatisfacer = ciclos; }
     public void setSuspendido(boolean suspendido) { this.suspendido = suspendido; }
-    public void setCiclosEsperaES(int ciclos) { this.ciclosEsperaES = ciclos; }
     
     // MÉTODOS DE EJECUCIÓN (ESENCIALES)
     public void ejecutarCiclo() {
         if (estaTerminado() || suspendido || estado == Estado.BLOQUEADO) {
-            return;
-        }
-        
-        // Si está esperando E/S, reducir contador
-        if (ciclosEsperaES > 0) {
-            ciclosEsperaES--;
-            if (ciclosEsperaES == 0 && estado == Estado.BLOQUEADO) {
-                // E/S completada, volver a estado listo
-                this.estado = Estado.LISTO;
-            }
             return;
         }
         
@@ -114,7 +104,6 @@ public class PCB {
     
     private void generarExcepcionES() {
         this.estado = Estado.BLOQUEADO;
-        this.ciclosEsperaES = ciclosParaSatisfacer;
     }
     
     // MÉTODOS DE UTILIDAD

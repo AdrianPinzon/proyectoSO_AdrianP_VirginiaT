@@ -144,15 +144,28 @@ public class ControladorSimulador {
         try {
             Planificador nuevoPlanificador = crearPlanificador(tipoPlanificador);
             gestorColas.setPlanificador(nuevoPlanificador);
-            
-            // Configurar quantum si es Round Robin
-            if (nuevoPlanificador instanceof RoundRobinPlanificador) {
-                ((RoundRobinPlanificador) nuevoPlanificador).setQuantum(configuracion.getQuantum());
-                hiloSimulador.setQuantum(configuracion.getQuantum());
+
+            // 👈 VERIFICACIÓN DE NULIDAD CRÍTICA
+            if (nuevoPlanificador == null) {
+                logger.log("Error: El planificador '" + tipoPlanificador + "' no pudo ser creado.");
+                actualizarVista();
+                return; // Sale del método si es nulo.
             }
-            
+
+            // 1. CONFIGURACIÓN DEL MODELO: Asignar el nuevo planificador
+            gestorColas.setPlanificador(nuevoPlanificador);
+
+            // 2. LÓGICA CONDICIONAL: Ya es segura porque nuevoPlanificador no es null
+            if (nuevoPlanificador instanceof RoundRobinPlanificador roundRobinPlanificador) { 
+                 roundRobinPlanificador.setQuantum(configuracion.getQuantum());
+                 hiloSimulador.setQuantum(configuracion.getQuantum());
+            }
+
             logger.log("Planificador cambiado a: " + nuevoPlanificador.getNombre());
-            
+
+            // 👈 LÍNEA CRÍTICA: La actualización debe ejecutarse SIEMPRE
+            actualizarVista(); 
+
         } catch (Exception e) {
             logger.log("Error al cambiar planificador: " + e.getMessage());
         }
@@ -162,20 +175,20 @@ public class ControladorSimulador {
         switch (tipo.toUpperCase()) {
             case "FCFS":
                 return new FCFSPlanificador();
-            case "SJF":
-                return new SJFPlanificador();
-            case "SRTN":
-                return new SRTNPlanificador();
+            case "SPN":
+                return new SPNPlanificador();
+            case "SRT":
+                return new SRTPlanificador();
             case "ROUNDROBIN":
                 RoundRobinPlanificador rr = new RoundRobinPlanificador(configuracion.getQuantum());
                 hiloSimulador.setQuantum(configuracion.getQuantum());
                 return rr;
-            case "PRIORIDAD":
-                return new PrioridadPlanificador(true);
-            case "MULTIPLESCOLAS":
-                return new MultiplesColasPlanificador();
-            default:
-                return new FCFSPlanificador();
+            case "HRRN":
+                return new HRRNPlanificador(true);
+            case "FB":  
+            return new FBPlanificador();
+        default:
+            return new FCFSPlanificador();
         }
     }
     

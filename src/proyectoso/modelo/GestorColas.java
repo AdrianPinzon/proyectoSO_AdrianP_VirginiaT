@@ -3,6 +3,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package proyectoso.modelo;
+import proyectoso.controlador.ListaHilosExcepcion; 
+import proyectoso.hilos.HiloExcepcion;
 
 public class GestorColas {
     // COLAS PRINCIPALES (REQUERIDAS)
@@ -17,12 +19,15 @@ public class GestorColas {
     // Cola de nuevos procesos (antes de ser admitidos)
     private ColaPCB colaNuevos;
     
+    private ListaHilosExcepcion listaHilosExcepcion; // 👈 Referencia
+    
     // Planificador actual
     private Planificador planificador;
     
     // Contadores para métricas
     private int cicloActual;
     private int procesosCompletados;
+    
     
     public GestorColas() {
         this.colaListos = new ColaPCB();
@@ -37,6 +42,8 @@ public class GestorColas {
         
         this.cicloActual = 0;
         this.procesosCompletados = 0;
+        
+        this.listaHilosExcepcion = new ListaHilosExcepcion(); // 👈 Inicializar
     }
     
     // MÉTODOS PRINCIPALES DE GESTIÓN
@@ -68,11 +75,11 @@ public class GestorColas {
      * Selecciona el siguiente proceso a ejecutar usando el planificador actual
      */
     public PCB seleccionarSiguiente() {
-        PCB siguiente = planificador.seleccionarSiguiente(colaListos);
+        PCB siguiente = planificador.seleccionarSiguiente(colaListos, cicloActual); // 👈 AÑADIR cicloActual
         
         if (siguiente != null) {
             // Lógica específica para múltiples colas
-            manejarMultiplesColas(siguiente);
+            manejarFB(siguiente);
         
             // Remover de cola de listos
             colaListos.removerPCB(siguiente);
@@ -91,8 +98,7 @@ public class GestorColas {
     public void ejecutarCiclo() {
         cicloActual++;
         
-        // 1. Manejar procesos bloqueados
-        manejarProcesosBloqueados();
+        
         
         // 2. Manejar suspensión de procesos (gestión de memoria)
         manejarSuspensionProcesos();
@@ -101,32 +107,7 @@ public class GestorColas {
         admitirProcesos();
     }
     
-    /**
-     * Maneja los procesos en cola de bloqueados
-     */
-    private void manejarProcesosBloqueados() {
-        ColaPCB temp = new ColaPCB();
-        
-        while (!colaBloqueados.estaVacia()) {
-            PCB pcb = colaBloqueados.remover();
-            
-            // Ejecutar ciclo (para reducir contadores de E/S)
-            pcb.ejecutarCiclo();
-            
-            // Si sigue bloqueado, volver a la cola
-            if (pcb.getEstado() == Estado.BLOQUEADO) {
-                temp.agregar(pcb);
-            } else if (pcb.getEstado() == Estado.LISTO) {
-                // E/S completada, volver a listos
-                colaListos.agregar(pcb);
-            }
-        }
-        
-        // Restaurar procesos que siguen bloqueados
-        while (!temp.estaVacia()) {
-            colaBloqueados.agregar(temp.remover());
-        }
-    }
+ 
     
     /**
      * Maneja la suspensión de procesos por memoria (REQUERIDO)
@@ -155,9 +136,9 @@ public class GestorColas {
     /**
     * Maneja la lógica específica para múltiples colas
     */
-    private void manejarMultiplesColas(PCB procesoEjecutando) {
-        if (planificador instanceof MultiplesColasPlanificador) {
-           MultiplesColasPlanificador multiColas = (MultiplesColasPlanificador) planificador;
+    private void manejarFB(PCB procesoEjecutando) {
+        if (planificador instanceof FBPlanificador) {
+           FBPlanificador multiColas = (FBPlanificador) planificador;
 
            // Remover el proceso ejecutado de las colas internas
            if (procesoEjecutando != null) {
@@ -176,8 +157,18 @@ public class GestorColas {
      * Bloquea un proceso (por E/S)
      */
     public void bloquearProceso(PCB pcb) {
+        // 1. Cambiar estado y mover a la cola visible de bloqueados
         pcb.setEstado(Estado.BLOQUEADO);
-        colaBloqueados.agregar(pcb);
+        colaBloqueados.agregar(pcb); // 👈 (Seguro por ColaPCB.semaforoCola)
+        
+        // 2. INICIAR EL HILO DE EXCEPCIÓN
+        HiloExcepcion hilo = new HiloExcepcion(
+            pcb, 
+            pcb.getCiclosParaSatisfacer(), 
+            this // Pasar la referencia del GestorColas
+        );
+        listaHilosExcepcion.agregar(hilo); // Añadir a la lista de hilos activos
+        hilo.start();
     }
     
     /**
@@ -194,9 +185,12 @@ public class GestorColas {
      * Reanuda un proceso previamente bloqueado
      */
     public void reanudarProceso(PCB pcb) {
+        // Llamado desde HiloExcepcion.run() al terminar E/S.
+        // Estas operaciones son seguras porque ColaPCB tiene semáforos.
         if (colaBloqueados.removerPCB(pcb)) {
             pcb.setEstado(Estado.LISTO);
             colaListos.agregar(pcb);
+            // Opcional: listaHilosExcepcion.remover(pcb); si implementas ese método.
         }
     }
     
