@@ -233,7 +233,7 @@ public class VentanaPrincipal extends JFrame implements Vista {
         panelConfiguracion.add(spinnerCiclosExcepcion);
         
         // CICLOS PARA SATISFACER
-        spinnerCiclosSatisfaccion = new JSpinner(new SpinnerNumberModel(3, 1, 10, 1));
+        spinnerCiclosSatisfaccion = new JSpinner(new SpinnerNumberModel(3, 1, 100, 1));
         panelConfiguracion.add(new JLabel("Ciclos para satisfacer E/S:"));
         panelConfiguracion.add(spinnerCiclosSatisfaccion);
         
