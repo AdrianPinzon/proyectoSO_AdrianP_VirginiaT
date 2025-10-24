@@ -4,6 +4,13 @@
  */
 package proyectoso.modelo;
 
+/*
+ Planificación HRRN
+ * prioriza el proceso que tiene la razón (ratio) de respuesta más alta. 
+ * Esta razón combina el tiempo de servicio (S) con el tiempo que el proceso ha estado
+ * esperando (W), mitigando así la inanición de los procesos largos
+*/
+
 public class HRRNPlanificador implements Planificador {
     private boolean prioridadMayorPrimero; // true: mayor prioridad primero
     
