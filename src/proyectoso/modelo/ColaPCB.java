@@ -5,6 +5,12 @@
 package proyectoso.modelo;
 import java.util.concurrent.Semaphore;
 
+/*
+ * Representa una implementación de una Cola (FIFO) de Bloques de Control de Proceso (PCB).
+ * Garantizar la exclusión mutua durante todas las operaciones de modificación 
+ * y acceso a la estructura de datos interna. 
+*/
+
 public class ColaPCB {
     private NodoPCB primero;
     private NodoPCB ultimo;
