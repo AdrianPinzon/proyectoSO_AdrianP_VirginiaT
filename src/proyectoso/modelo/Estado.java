@@ -4,6 +4,10 @@
  */
 package proyectoso.modelo;
 
+/*
+ * Define los posibles estados en los que puede encontrarse el PCB
+*/
+
 public enum Estado {
     NUEVO,
     LISTO, 
