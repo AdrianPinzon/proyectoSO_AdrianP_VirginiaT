@@ -4,6 +4,15 @@
  */
 package proyectoso.modelo;
 
+/*
+ * Planificación FCFS
+ * El proceso que llega primero a la cola de listos 
+ * es el primero en ser seleccionado para su ejecución.
+ * No Preexpropiable . Una vez que un proceso 
+ * inicia su ejecución, solo puede ser desalojado si termina o si se bloquea 
+ * por una operación de E/S.
+*/
+
 public class FCFSPlanificador implements Planificador {
     
     @Override
@@ -11,6 +20,7 @@ public class FCFSPlanificador implements Planificador {
         if (colaListos == null || colaListos.estaVacia()) {
             return null;
         }
+        // Retorna el proceso que llegó primero sin removerlo
         return colaListos.getPrimero();
     }
     @Override
