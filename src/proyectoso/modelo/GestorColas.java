@@ -6,6 +6,12 @@ package proyectoso.modelo;
 import proyectoso.controlador.ListaHilosExcepcion; 
 import proyectoso.hilos.HiloExcepcion;
 
+/*
+ * Responsable de mantener y gestionar todas las colas de procesos 
+ * coordina con el Planificador para la selección de la CPU, 
+ * iniciar la simulación de E/S y calcular métricas de rendimiento.
+*/
+
 public class GestorColas {
     // COLAS PRINCIPALES (REQUERIDAS)
     private ColaPCB colaListos;
