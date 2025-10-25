@@ -4,6 +4,12 @@
  */
 package proyectoso.util;
 
+/*
+Clase que agrupa métodos estáticos de propósito general, 
+ * como manipulación de cadenas, validación, formateo de tiempo y cálculos matemáticos simples.
+ * Los métodos en esta clase no dependen del estado de la simulación.
+ */
+
 public class Util {
     
     /**
