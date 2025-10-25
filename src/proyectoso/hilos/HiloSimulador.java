@@ -9,6 +9,14 @@ import proyectoso.modelo.*;
 import proyectoso.controlador.*;
 import java.util.concurrent.Semaphore;
 
+/*
+Hilo principal de la simulación, se encarga de impulsar el avance de la simulación
+ciclo por ciclo.  En cada ciclo, coordina la ejecución de un proceso, la lógica de
+planificación  (incluyendo el manejo del Quantum para Round Robin), la detección de
+terminaciones o interrupciones de I/O y la actualización de la interfaz gráfica a
+través del controlador.
+*/
+
 public class HiloSimulador extends Thread {
     private GestorColas gestorColas;
     private ControladorSimulador controlador;
