@@ -9,6 +9,14 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+
+/*
+Proporciona funcionalidad centralizada para el registro de eventos (logging)
+ * de la simulación.
+ * Cada entrada de log incluye una marca de tiempo (timestamp) y es escrita 
+ * tanto en la consola (stdout) como en un archivo persistente (simulacion.log).
+*/
+
 public class Logger {
     private static final String ARCHIVO_LOG = "simulacion.log";
     private SimpleDateFormat dateFormat;
