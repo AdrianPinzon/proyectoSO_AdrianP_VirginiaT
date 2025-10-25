@@ -4,6 +4,14 @@
  */
 package proyectoso.modelo;
 
+/*
+Planificación SPN, No Preexpropiable.
+ * Selecciona el proceso de la cola de listos que tiene el menor tiempo 
+ * de ejecución total. Una vez seleccionado, el proceso se 
+ * ejecuta hasta que termina o se bloquea (no puede ser desalojado por otro proceso 
+ * más corto que llegue después).
+*/
+
 public class SPNPlanificador implements Planificador {
     
     @Override
