@@ -4,6 +4,13 @@
  */
 package proyectoso.modelo;
 
+/*
+Planificación SRT, Preexpropiable.
+ * Selecciona el proceso que tiene el menor tiempo de ejecución restante.
+ * Un proceso en ejecución puede ser desalojado por un proceso recién llegado
+ * si este último tiene un tiempo restante más corto.
+*/
+
 public class SRTPlanificador implements Planificador {
     
     @Override
