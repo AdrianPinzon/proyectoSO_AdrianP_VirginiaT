@@ -7,6 +7,12 @@ package proyectoso;
 import proyectoso.controlador.ControladorSimulador;
 import proyectoso.vista.VentanaPrincipal;
 
+/*
+ * Se encarga de inicializar el patrón de diseño MVC (Modelo-Vista-Controlador)
+ * para el Simulador de Planificación de Procesos y de manejar cualquier
+ * error crítico durante la carga inicial.
+*/
+
 public class Main {
     public static void main(String[] args) {
         // Versión simplificada sin LookAndFeel
