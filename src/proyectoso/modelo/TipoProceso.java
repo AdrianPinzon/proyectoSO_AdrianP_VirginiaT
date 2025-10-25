@@ -4,6 +4,11 @@
  */
 package proyectoso.modelo;
 
+/*
+ * Define la clasificación del comportamiento de un proceso, indicando qué
+ * tipo de recurso consume predominantemente.
+*/
+
 public enum TipoProceso {
     CPU_BOUND,  // Muy consumidor de procesador
     IO_BOUND    // Muy consumidor de E/S
