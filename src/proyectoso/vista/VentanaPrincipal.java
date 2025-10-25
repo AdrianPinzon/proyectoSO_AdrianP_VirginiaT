@@ -7,6 +7,8 @@ package proyectoso.vista;
 import proyectoso.controlador.ControladorSimulador;
 import proyectoso.modelo.*;
 import proyectoso.util.Metricas;
+import proyectoso.util.Configuracion;
+
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
@@ -216,25 +218,26 @@ public class VentanaPrincipal extends JFrame implements Vista {
     
     private void crearComponentesConfiguracion() {
         panelConfiguracion.setBorder(BorderFactory.createTitledBorder("Configuración del Sistema"));
+        Configuracion config = controlador.getConfiguracion();
         
         // DURACIÓN DEL CICLO
-        spinnerDuracionCiclo = new JSpinner(new SpinnerNumberModel(1000, 100, 5000, 100));
+        spinnerDuracionCiclo = new JSpinner(new SpinnerNumberModel((int) config.getDuracionCicloMs(), 100, 5000, 100));        
         panelConfiguracion.add(new JLabel("Duración del ciclo (ms):"));
         panelConfiguracion.add(spinnerDuracionCiclo);
         
         // QUANTUM
-        spinnerQuantum = new JSpinner(new SpinnerNumberModel(3, 1, 10, 1));
+        spinnerQuantum = new JSpinner(new SpinnerNumberModel((int) config.getQuantum(), 1, 10, 1));
         panelConfiguracion.add(new JLabel("Quantum (Round Robin):"));
         panelConfiguracion.add(spinnerQuantum);
         
         // CICLOS PARA EXCEPCIÓN
-        spinnerCiclosExcepcion = new JSpinner(new SpinnerNumberModel(5, 1, 20, 1));
+        spinnerCiclosExcepcion = new JSpinner(new SpinnerNumberModel((int) config.getCiclosExcepcion(), 1, 20, 1));
         panelConfiguracion.add(new JLabel("Ciclos para excepción E/S:"));
         panelConfiguracion.add(spinnerCiclosExcepcion);
         
         
         // CICLOS PARA SATISFACER
-        spinnerCiclosSatisfaccion = new JSpinner(new SpinnerNumberModel(3, 1, 100, 1));
+        spinnerCiclosSatisfaccion = new JSpinner(new SpinnerNumberModel((int) config.getCiclosSatisfaccion(), 1, 100, 1));
         panelConfiguracion.add(new JLabel("Ciclos para satisfacer E/S:"));
         panelConfiguracion.add(spinnerCiclosSatisfaccion);
         
