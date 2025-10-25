@@ -11,6 +11,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 
+/*
+ * Clase encargada de la lectura y escritura de archivos
+ * para la persistencia de datos y la exportación de resultados de la simulación.
+ * Utiliza el formato CSV para guardar y cargar
+ * la configuración, métricas y el estado de las colas de procesos.
+*/
+
 public class GestorArchivos {
     private static final String ARCHIVO_CONFIG = "configuracion.csv";
     
@@ -121,6 +128,7 @@ public class GestorArchivos {
     }
     
     public void exportarDatosSimulacion(Configuracion config, Metricas metricas, ColaPCB[] colas, String[] nombresColas) {
+        // Genera un timestamp para asegurar nombres de archivo únicos para métricas/colas
         String timestamp = String.valueOf(System.currentTimeMillis());
         
         guardarConfiguracion(config);
