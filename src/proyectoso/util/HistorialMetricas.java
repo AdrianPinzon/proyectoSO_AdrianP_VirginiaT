@@ -4,6 +4,13 @@
  */
 package proyectoso.util;
 
+/*
+ * Almacena el historial de las métricas clave de la simulación (Throughput, 
+ * Utilización de CPU y Tiempo de Respuesta Promedio)
+ * Permite almacenar un número fijo de las últimas mediciones para su 
+ * visualización en gráficas de tendencia sin agotar la memoria.
+*/
+
 public class HistorialMetricas {
     private double[] throughput;
     private double[] utilizacion;
