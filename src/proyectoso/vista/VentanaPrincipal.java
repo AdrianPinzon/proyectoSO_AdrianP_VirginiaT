@@ -232,6 +232,7 @@ public class VentanaPrincipal extends JFrame implements Vista {
         panelConfiguracion.add(new JLabel("Ciclos para excepción E/S:"));
         panelConfiguracion.add(spinnerCiclosExcepcion);
         
+        
         // CICLOS PARA SATISFACER
         spinnerCiclosSatisfaccion = new JSpinner(new SpinnerNumberModel(3, 1, 100, 1));
         panelConfiguracion.add(new JLabel("Ciclos para satisfacer E/S:"));
@@ -305,6 +306,8 @@ public class VentanaPrincipal extends JFrame implements Vista {
         
         controlador.configurarDuracionCiclo(duracionCiclo);
         controlador.configurarQuantum(quantum);
+        controlador.configurarCiclosExcepcion(ciclosExcepcion);
+        controlador.configurarCiclosSatisfaccion(ciclosSatisfaccion);
     }
     
     private void mostrarDialogoAgregarProceso() {

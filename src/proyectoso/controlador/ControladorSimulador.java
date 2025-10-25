@@ -236,6 +236,18 @@ public class ControladorSimulador {
         guardarConfiguracion();
     }
     
+    public void configurarCiclosExcepcion(int ciclos) {
+        configuracion.setCiclosExcepcion(ciclos); // Asume que Configuracion tiene el setter
+        logger.log("Ciclos de excepción configurados a: " + ciclos);
+        guardarConfiguracion(); // Guarda el cambio
+    }
+
+    public void configurarCiclosSatisfaccion(int ciclos) {
+        configuracion.setCiclosSatisfaccion(ciclos); // Asume que Configuracion tiene el setter
+        logger.log("Ciclos de satisfacción configurados a: " + ciclos);
+        guardarConfiguracion(); // Guarda el cambio
+    }
+    
     // MÉTRICAS Y ESTADÍSTICAS
     
     public Metricas getMetricas() {
