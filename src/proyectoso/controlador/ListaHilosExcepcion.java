@@ -11,7 +11,7 @@ import java.util.concurrent.Semaphore;
  * diseñada para almacenar y gestionar instancias 
  * Esta lista se utiliza para controlar hilos que representan operaciones asíncronas
  * (como solicitudes de I/O) y permite su manipulación segura en un entorno 
- * de simulación concurrente gracias al uso de un semáforos.
+ * de simulación concurrente gracias al uso de semáforos.
 */
 
 public class ListaHilosExcepcion {
