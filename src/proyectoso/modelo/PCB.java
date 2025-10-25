@@ -4,6 +4,11 @@
  */
 package proyectoso.modelo;
 
+/*
+ * PCB contiene toda la información necesaria para gestionar un proceso
+ * Incluye registros de CPU, estado del proceso, información de memoria,
+ * y métricas de rendimiento.
+*/
 
 public class PCB {
     // Atributos de identificación
