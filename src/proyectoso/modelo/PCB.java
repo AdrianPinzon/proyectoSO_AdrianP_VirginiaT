@@ -142,9 +142,14 @@ public class PCB {
     
     @Override
     public String toString() {
-        return nombre + " (" + id + ") - PC: " + programCounter + 
+        // 👈 CRÍTICO: Debe mostrar el PC, MAR, Instrucciones y el Estado completo
+        return nombre + " (" + id + ")" + 
+               " - PC: " + programCounter + 
+               " - MAR: " + memoryAddressRegister + // 👈 MAR Requerido
                " - Inst: " + instruccionesEjecutadas + "/" + totalInstrucciones + 
-               " - " + estado + (suspendido ? " [SUSPENDIDO]" : "") +
+               " - " + estado + 
+               // 👈 CRÍTICO: Muestra si está SUSPENDIDO
+               (suspendido ? " [SUSPENDIDO]" : "") +
                " - " + tipo;
     }
 }
