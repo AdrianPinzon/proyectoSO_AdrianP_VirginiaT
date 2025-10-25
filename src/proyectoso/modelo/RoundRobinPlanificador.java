@@ -4,6 +4,14 @@
  */
 package proyectoso.modelo;
 
+/*
+ * Planificación Round Robin
+ * Este algoritmo es preexpropiable y utiliza una unidad de tiempo fija ( quantum )
+ * para dar a cada proceso una parte equitativa del tiempo de CPU.
+ * Los procesos se mantienen en una cola circular y cuando un proceso agota
+ * su quantum, es enviado al final de la cola.
+*/
+
 public class RoundRobinPlanificador implements Planificador {
     private int quantum;
     private int contadorQuantum;
