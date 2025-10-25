@@ -119,17 +119,21 @@ public class GestorColas {
         // Política simple: si hay más de 5 procesos listos, suspender algunos
         if (colaListos.getTamaño() > 5) {
             PCB aSuspender = colaListos.remover();
-            aSuspender.setEstado(Estado.SUSPENDIDO);
-            aSuspender.setSuspendido(true);
-            colaListosSuspendidos.agregar(aSuspender);
+            if (aSuspender != null) {
+                aSuspender.setEstado(Estado.SUSPENDIDO);
+                aSuspender.setSuspendido(true);
+                colaListosSuspendidos.agregar(aSuspender);
+            }
         }
         
         // Re-activar procesos suspendidos si hay pocos en memoria
         if (colaListos.getTamaño() < 3 && !colaListosSuspendidos.estaVacia()) {
             PCB aReactivar = colaListosSuspendidos.remover();
-            aReactivar.setEstado(Estado.LISTO);
-            aReactivar.setSuspendido(false);
-            colaListos.agregar(aReactivar);
+            if (aReactivar != null) {
+                aReactivar.setEstado(Estado.LISTO);
+                aReactivar.setSuspendido(false);
+                colaListos.agregar(aReactivar);
+            }
         }
     }
     

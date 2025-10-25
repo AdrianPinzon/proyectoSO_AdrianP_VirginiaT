@@ -472,6 +472,7 @@ public class VentanaPrincipal extends JFrame implements Vista {
         }
 
         // LAS OTRAS COLAS SIEMPRE SE MUESTRAN NORMAL
+        actualizarAreaCola(areaListos, controlador.getGestorColas().getColaListos());
         actualizarAreaCola(areaBloqueados, controlador.getGestorColas().getColaBloqueados());
         actualizarAreaCola(areaTerminados, controlador.getGestorColas().getColaTerminados());
         actualizarAreaCola(areaListosSuspendidos, controlador.getGestorColas().getColaListosSuspendidos());
@@ -523,5 +524,7 @@ public class VentanaPrincipal extends JFrame implements Vista {
         
         lblCicloActual.setText("Ciclo actual: " + gestor.getCicloActual());
     }
+    
+    
     
 }
