@@ -7,6 +7,12 @@ package proyectoso.controlador;
 import proyectoso.hilos.HiloExcepcion;
 import java.util.concurrent.Semaphore;
 
+/*
+Representa una lista enlazada simple y segura para hilos diseñada para almacenar y gestionar instancias.
+Esta lista se utiliza para controlar hilos que representan operaciones asíncronas (como solicitudes de I/O)
+y permite su manipulación segura en un entorno simulación concurrente gracias al uso de un semáforo.
+*/
+
 public class ListaHilosExcepcion {
     private NodoHilo primero;
     private NodoHilo ultimo;
