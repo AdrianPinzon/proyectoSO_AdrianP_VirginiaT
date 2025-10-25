@@ -9,6 +9,13 @@ import proyectoso.util.HistorialMetricas;
 import javax.swing.*;
 import java.awt.*;
 
+/*
+ * Muestra el Throughput, la Utilización de CPU y el Tiempo de Respuesta Promedio
+ * como gráficos de línea utilizando un historial de métricas con buffer circular.
+ *
+ */
+
+
 public class PanelGraficas extends JPanel {
     private HistorialMetricas historial;
     
