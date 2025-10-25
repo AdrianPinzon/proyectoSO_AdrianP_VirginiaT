@@ -4,6 +4,10 @@
  */
 package proyectoso.vista;
 
+/*
+ * Interfaz que define el contrato para cualquier componente de la Interfaz de Usuario
+ * que necesite ser actualizado en respuesta a cambios en el modelo de la simulación.
+*/
 
 public interface Vista {
     void actualizarVista();
