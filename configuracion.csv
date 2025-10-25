@@ -1,5 +1,5 @@
 parametro,valor
-duracionCicloMs,2100
+duracionCicloMs,200
 quantum,10
-ciclosExcepcion,2
+ciclosExcepcion,10
 ciclosSatisfaccion,20
