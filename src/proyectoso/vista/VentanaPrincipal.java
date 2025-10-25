@@ -13,6 +13,12 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+
+/*
+ * Implementa la interfaz Vista para recibir y mostrar las actualizaciones
+ * del modelo y del controlador.
+ */
+
 public class VentanaPrincipal extends JFrame implements Vista {
     private ControladorSimulador controlador;
     
