@@ -4,6 +4,12 @@
  */
 package proyectoso.util;
 
+/*
+Clase que almacena y gestiona las métricas de rendimiento claves de la simulación.
+ * Estas métricas son utilizadas para evaluar la eficiencia del algoritmo de planificación 
+ * de CPU y la gestión general del sistema operativo simulado.
+*/
+
 public class Metricas {
     private double throughput;
     private double utilizacionCPU;
