@@ -4,6 +4,12 @@
  */
 package proyectoso.util;
 
+/*
+ * Clase estática que almacena y gestiona los parámetros globales de la simulación
+ * Permite configurar la velocidad de la simulación, el quantum de tiempo 
+ * para Round Robin y el comportamiento por defecto de las excepciones de E/S.
+*/
+
 public class Configuracion {
     private int duracionCicloMs;
     private int quantum;
@@ -11,10 +17,10 @@ public class Configuracion {
     private int ciclosSatisfaccion;
     
     public Configuracion() {
-        this.duracionCicloMs = 1000;
-        this.quantum = 3;
-        this.ciclosExcepcion = 5;
-        this.ciclosSatisfaccion = 3;
+        this.duracionCicloMs = 1000; // 1 segundo por ciclo
+        this.quantum = 3; // Quantum de 3 ciclos
+        this.ciclosExcepcion = 5; // E/S cada 5 instrucciones
+        this.ciclosSatisfaccion = 3; // E/S dura 3 ciclos
     }
     
     // Getters y Setters
