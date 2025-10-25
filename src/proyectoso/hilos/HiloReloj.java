@@ -6,6 +6,13 @@ package proyectoso.hilos;
 
 import proyectoso.controlador.ControladorSimulador;
 
+/*
+Hilo dedicado a simular el paso del tiempo o 'ticks' dentro del simulador.
+Su principal función es dormir durante un intervalo y luego notificar que ha
+ocurrido un nuevo ciclo, lo que permite actualizar métricas y la interfaz de usuario
+en intervalos regulares.
+*/
+
 public class HiloReloj extends Thread {
     private ControladorSimulador controlador;
     private volatile boolean ejecutando;
