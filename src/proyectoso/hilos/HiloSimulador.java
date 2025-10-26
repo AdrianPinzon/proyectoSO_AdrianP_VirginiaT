@@ -48,19 +48,19 @@ public class HiloSimulador extends Thread {
      */
     private void ejecutarCicloSimulacion() {
         try {
-            // 👈 MODO KERNEL (SO): Inicio del cambio de contexto
+            //MODO KERNEL (SO): Inicio del cambio de contexto
             setModoActual("Sistema Operativo");
             semaforo.acquire(); // REQUERIDO: exclusión mutua
             
-            // 1. Ejecutar ciclo del gestor de colas
+            //Ejecutar ciclo del gestor de colas
             gestorColas.ejecutarCiclo();
             
-            // 2. Manejar el proceso actual en ejecución
+            //Manejar el proceso actual en ejecución
             manejarProcesoActual();
             
             // 3. Seleccionar nuevo proceso si es necesario
             if (procesoEjecutando == null || procesoEjecutando.getEstado() != Estado.EJECUCION) {
-                // 👈 MODO USUARIO: Ejecución de la instrucción
+                // MODO USUARIO: Ejecución de la instrucción
                 setModoActual("Programa de Usuario");
                 seleccionarNuevoProceso();
             }
