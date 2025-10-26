@@ -25,9 +25,7 @@ public class GestorArchivos {
             pw.println("duracionCicloMs," + config.getDuracionCicloMs());
             pw.println("quantum," + config.getQuantum());
             pw.println("ciclosExcepcion," + config.getCiclosExcepcion());
-            pw.println("ciclosSatisfaccion," + config.getCiclosSatisfaccion());
-            pw.println("numProcesadores," + config.getNumProcesadores());
-            
+            pw.println("ciclosSatisfaccion," + config.getCiclosSatisfaccion());            
         } catch (Exception e) {
             throw new RuntimeException("Error guardando configuración: " + e.getMessage());
         }
@@ -65,9 +63,7 @@ public class GestorArchivos {
                         case "ciclosSatisfaccion":
                             config.setCiclosSatisfaccion(Integer.parseInt(valor));
                             break;
-                        case "numProcesadores":
-                            config.setNumProcesadores(Integer.parseInt(valor));
-                            break;    
+                            
                     }
                 }
             }

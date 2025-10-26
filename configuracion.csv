@@ -1,6 +1,5 @@
 parametro,valor
-duracionCicloMs,600
+duracionCicloMs,800
 quantum,8
 ciclosExcepcion,2
-ciclosSatisfaccion,33
-numProcesadores,1
+ciclosSatisfaccion,34

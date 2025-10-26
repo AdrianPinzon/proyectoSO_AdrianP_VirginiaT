@@ -43,11 +43,11 @@ public class VentanaPrincipal extends JFrame implements Vista {
     // COMPONENTES DE CPU
     private JLabel lblProcesoEjecutando, lblPC, lblMAR, lblInstrucciones;
     private JLabel lblQuantum, lblCicloActual;
+    private JLabel lblModoActual;
     
     // COMPONENTES DE CONFIGURACIÓN
     private JSpinner spinnerDuracionCiclo, spinnerQuantum;
     private JSpinner spinnerCiclosExcepcion, spinnerCiclosSatisfaccion;
-    private JSpinner spinnerNumProcesadores;
     
     // COMPONENTES DE MÉTRICAS
     private JLabel lblThroughput, lblUtilizacionCPU, lblTiempoRespuesta;
@@ -81,10 +81,21 @@ public class VentanaPrincipal extends JFrame implements Vista {
         // INICIALIZAR PANELES PRIMERO
         panelPrincipal = new JPanel(new BorderLayout());
         panelControl = new JPanel(new FlowLayout());
-        panelColas = new JPanel(new GridLayout(2, 3, 5, 5));
+        panelColas = new JPanel(new GridLayout(5, 1, 1, 1));
         panelCPU = new JPanel(new GridLayout(6, 1, 5, 5));
         panelMetricas = new JPanel(new GridLayout(5, 1, 10, 10));
-        panelConfiguracion = new JPanel(new GridLayout(4, 2, 10, 10));
+        panelConfiguracion = new JPanel(new GridLayout(5, 2, 15, 15));
+        
+        // Color RGB personalizado (Beige Suave)
+        Color beigeClaro = new Color(255, 250, 205); 
+        panelPrincipal.setBackground(beigeClaro); 
+        panelColas.setBackground(beigeClaro);
+        panelCPU.setBackground(beigeClaro);
+        panelMetricas.setBackground(beigeClaro);
+        panelConfiguracion.setBackground(beigeClaro);
+
+        panelControl = new JPanel(new FlowLayout());
+        panelControl.setBackground(beigeClaro);
         
         // CREAR COMPONENTES
         crearComponentesControl();
@@ -179,12 +190,16 @@ public class VentanaPrincipal extends JFrame implements Vista {
         lblQuantum = crearEtiquetaCPU("Quantum actual: 0/0");
         lblCicloActual = crearEtiquetaCPU("Ciclo actual: 0");
         
+        // 👈 CREAR ETIQUETA DE MODO
+        lblModoActual = crearEtiquetaCPU("Modo: Inicializando");
+        
         panelCPU.add(lblProcesoEjecutando);
         panelCPU.add(lblPC);
         panelCPU.add(lblMAR);
         panelCPU.add(lblInstrucciones);
         panelCPU.add(lblQuantum);
         panelCPU.add(lblCicloActual);
+        panelCPU.add(lblModoActual);
     }
     
     private JLabel crearEtiquetaCPU(String texto) {
@@ -217,40 +232,60 @@ public class VentanaPrincipal extends JFrame implements Vista {
         return label;
     }
     
+    /**
+    * Crea un panel que agrupa una etiqueta y un spinner.
+    */
+    private JPanel crearConfigPanel(String labelText, JSpinner spinner, SpinnerNumberModel model) {
+        JPanel panel = new JPanel(new GridLayout(2, 1)); // Etiqueta arriba, Spinner abajo
+
+        // Inicializar el spinner que está declarado como atributo
+        // (Asumo que los atributos spinnerDuracionCiclo, spinnerQuantum, etc. 
+        // se inicializan en este método en realidad).
+        if (spinner == spinnerDuracionCiclo) {
+            spinnerDuracionCiclo = new JSpinner(model);
+            spinner = spinnerDuracionCiclo;
+        } 
+        
+
+        spinner.setModel(model);
+
+        panel.add(new JLabel(labelText));
+        panel.add(spinner);
+
+        return panel;
+    }
+    
     private void crearComponentesConfiguracion() {
-        panelConfiguracion.setBorder(BorderFactory.createTitledBorder("Configuración del Sistema"));
         Configuracion config = controlador.getConfiguracion();
-        
-        // DURACIÓN DEL CICLO
-        spinnerDuracionCiclo = new JSpinner(new SpinnerNumberModel((int) config.getDuracionCicloMs(), 100, 5000, 100));        
+        panelConfiguracion.setBorder(BorderFactory.createTitledBorder("Configuración del Sistema"));
+
+        // FILA 1: DURACIÓN DEL CICLO (Etiqueta, Spinner)
         panelConfiguracion.add(new JLabel("Duración del ciclo (ms):"));
-        panelConfiguracion.add(spinnerDuracionCiclo);
-        
-        // QUANTUM
-        spinnerQuantum = new JSpinner(new SpinnerNumberModel((int) config.getQuantum(), 1, 10, 1));
+        panelConfiguracion.add(spinnerDuracionCiclo = new JSpinner(new SpinnerNumberModel(
+            (int) config.getDuracionCicloMs(), 100, 5000, 100)));
+
+        // FILA 2: QUANTUM (Etiqueta, Spinner)
         panelConfiguracion.add(new JLabel("Quantum (Round Robin):"));
-        panelConfiguracion.add(spinnerQuantum);
-        
-        // CICLOS PARA EXCEPCIÓN
-        spinnerCiclosExcepcion = new JSpinner(new SpinnerNumberModel((int) config.getCiclosExcepcion(), 1, 20, 1));
+        panelConfiguracion.add(spinnerQuantum = new JSpinner(new SpinnerNumberModel(
+            (int) config.getQuantum(), 1, 10, 1)));
+
+        // FILA 3: CICLOS PARA EXCEPCIÓN (Etiqueta, Spinner)
         panelConfiguracion.add(new JLabel("Ciclos para excepción E/S:"));
-        panelConfiguracion.add(spinnerCiclosExcepcion);
-        
-        
-        // CICLOS PARA SATISFACER
-        spinnerCiclosSatisfaccion = new JSpinner(new SpinnerNumberModel((int) config.getCiclosSatisfaccion(), 1, 100, 1));
+        panelConfiguracion.add(spinnerCiclosExcepcion = new JSpinner(new SpinnerNumberModel(
+            (int) config.getCiclosExcepcion(), 1, 20, 1)));
+
+        // FILA 4: CICLOS PARA SATISFACER (Etiqueta, Spinner)
         panelConfiguracion.add(new JLabel("Ciclos para satisfacer E/S:"));
-        panelConfiguracion.add(spinnerCiclosSatisfaccion);
-        
-        // CREACIÓN DEL SPINNER (Límites requeridos: entre 2 y 3) 
-        spinnerNumProcesadores = new JSpinner(new SpinnerNumberModel(config.getNumProcesadores(), 1, 4, 1) );// Rango de 1 a 4, aunque el requisito pide entre 2 y 3
-        panelConfiguracion.add(new JLabel("Número de Procesadores:"));
-        panelConfiguracion.add(spinnerNumProcesadores);
-        
-        // BOTÓN PARA APLICAR CONFIGURACIÓN
+        panelConfiguracion.add(spinnerCiclosSatisfaccion = new JSpinner(new SpinnerNumberModel(
+            (int) config.getCiclosSatisfaccion(), 1, 100, 1)));
+
+        // FILA 5: BOTÓN (Celda Vacía, Botón)
+        // Usamos una etiqueta vacía para llenar la columna izquierda
+        panelConfiguracion.add(new JLabel("")); 
+
         JButton btnAplicarConfig = new JButton("Aplicar Configuración");
         btnAplicarConfig.addActionListener(e -> aplicarConfiguracion());
-        panelConfiguracion.add(btnAplicarConfig);
+        panelConfiguracion.add(btnAplicarConfig); 
     }
     
     private void organizarPaneles() {
@@ -312,13 +347,11 @@ public class VentanaPrincipal extends JFrame implements Vista {
         int quantum = (Integer) spinnerQuantum.getValue();
         int ciclosExcepcion = (Integer) spinnerCiclosExcepcion.getValue();
         int ciclosSatisfaccion = (Integer) spinnerCiclosSatisfaccion.getValue();
-        int numProcesadores = (Integer) spinnerNumProcesadores.getValue();
         
         controlador.configurarDuracionCiclo(duracionCiclo);
         controlador.configurarQuantum(quantum);
         controlador.configurarCiclosExcepcion(ciclosExcepcion);
         controlador.configurarCiclosSatisfaccion(ciclosSatisfaccion);
-        controlador.configurarNumProcesadores(numProcesadores);
     }
     
     private void mostrarDialogoAgregarProceso() {
@@ -510,8 +543,8 @@ public class VentanaPrincipal extends JFrame implements Vista {
         
         if (procesoEjecutando != null) {
             lblProcesoEjecutando.setText("Proceso ejecutando: " + procesoEjecutando.getNombre());
-            lblPC.setText("Program Counter: " + procesoEjecutando.getProgramCounter());
-            lblMAR.setText("Memory Address Register: " + procesoEjecutando.getMemoryAddressRegister());
+            lblPC.setText("Program Counter (Próx. Inst): " + procesoEjecutando.getProgramCounter());
+            lblMAR.setText("Memory Address Register (Dir.): " + procesoEjecutando.getMemoryAddressRegister());
             lblInstrucciones.setText("Instrucciones: " + 
                 procesoEjecutando.getInstruccionesEjecutadas() + "/" + 
                 procesoEjecutando.getTotalInstrucciones());
@@ -531,6 +564,10 @@ public class VentanaPrincipal extends JFrame implements Vista {
         }
         
         lblCicloActual.setText("Ciclo actual: " + gestor.getCicloActual());
+        
+        if (lblModoActual != null) {
+            lblModoActual.setText("Modo: " + controlador.getHiloSimulador().getModoActual());
+        }
     }
     
     
