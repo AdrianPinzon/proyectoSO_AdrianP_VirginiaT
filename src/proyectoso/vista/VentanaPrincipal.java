@@ -29,6 +29,7 @@ public class VentanaPrincipal extends JFrame implements Vista {
     // COMPONENTES DE CONTROL
     private JButton btnIniciar, btnPausar, btnReanudar, btnDetener, btnReiniciar;
     private JButton btnAgregarProceso;
+    private JButton btnAgregar20Procesos;
     private JComboBox<String> comboPlanificadores;
     private JLabel lblEstadoSimulacion;
     private JLabel lblPlanificadorActual;
@@ -118,6 +119,7 @@ public class VentanaPrincipal extends JFrame implements Vista {
         btnDetener = new JButton("Detener");
         btnReiniciar = new JButton("Reiniciar");
         btnAgregarProceso = new JButton("Agregar Proceso");
+        btnAgregar20Procesos = new JButton("Agregar 20 Procesos");
         
         // COMBO BOX DE PLANIFICADORES
         comboPlanificadores = new JComboBox<>(new String[]{
@@ -137,6 +139,7 @@ public class VentanaPrincipal extends JFrame implements Vista {
         panelControl.add(new JLabel("Planificador:"));
         panelControl.add(comboPlanificadores);
         panelControl.add(btnAgregarProceso);
+        panelControl.add(btnAgregar20Procesos);
         panelControl.add(lblEstadoSimulacion);
         panelControl.add(lblPlanificadorActual);
         
@@ -177,6 +180,13 @@ public class VentanaPrincipal extends JFrame implements Vista {
         JScrollPane scrollPane = new JScrollPane(area);
         scrollPane.setBorder(BorderFactory.createTitledBorder(titulo));
         return scrollPane;
+    }
+    
+    private void forzarScrollAbajo(JTextArea area) {
+        if (area != null) {
+            // Mueve el cursor al final del texto insertado
+            area.setCaretPosition(area.getDocument().getLength());
+        }
     }
     
     private void crearComponentesCPU() {
@@ -334,6 +344,7 @@ public class VentanaPrincipal extends JFrame implements Vista {
         btnReiniciar.addActionListener(e -> controlador.reiniciarSimulacion());
         
         btnAgregarProceso.addActionListener(e -> mostrarDialogoAgregarProceso());
+        btnAgregar20Procesos.addActionListener(e -> controlador.agregarCargaMasiva());
         
         comboPlanificadores.addActionListener(e -> {
             String planificador = (String) comboPlanificadores.getSelectedItem();
@@ -493,6 +504,7 @@ public class VentanaPrincipal extends JFrame implements Vista {
         // LÓGICA ESPECIAL PARA FEEDBACK (FB)
         if (controlador.getGestorColas().getPlanificador() instanceof FBPlanificador) {
             FBPlanificador fb = (FBPlanificador) controlador.getGestorColas().getPlanificador();
+            forzarScrollAbajo(areaListos);
 
             for (int i = 0; i < fb.getNumeroColas(); i++) {
                 areaListos.append("=== COLA " + i + " (Quantum: " + fb.getQuantum(i) + ") ===\n");
@@ -515,9 +527,13 @@ public class VentanaPrincipal extends JFrame implements Vista {
 
         // LAS OTRAS COLAS SIEMPRE SE MUESTRAN NORMAL
         actualizarAreaCola(areaBloqueados, controlador.getGestorColas().getColaBloqueados());
+        forzarScrollAbajo(areaBloqueados);
         actualizarAreaCola(areaTerminados, controlador.getGestorColas().getColaTerminados());
+        forzarScrollAbajo(areaBloqueados);
         actualizarAreaCola(areaListosSuspendidos, controlador.getGestorColas().getColaListosSuspendidos());
+        forzarScrollAbajo(areaBloqueados);
         actualizarAreaCola(areaBloqueadosSuspendidos, controlador.getGestorColas().getColaBloqueadosSuspendidos());
+        forzarScrollAbajo(areaBloqueados);   
     }
     
     private void actualizarAreaCola(JTextArea area, ColaPCB cola) {

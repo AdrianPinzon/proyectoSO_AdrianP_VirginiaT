@@ -43,24 +43,28 @@ public class FBPlanificador implements Planificador {
      * Distribuye procesos nuevos en la cola de mayor prioridad
      */
     public void distribuirProcesosNuevos(ColaPCB colaListosExterna) {
-        if (colaListosExterna == null || colaListosExterna.estaVacia()) {
-            return;
-        }
+    if (colaListosExterna == null || colaListosExterna.estaVacia()) {
+        return;
+    }
 
-        // Iteramos y removemos procesos de la cola externa
-        ColaPCB temp = new ColaPCB();
+    // Iterar y remover procesos de la cola externa
+    ColaPCB temp = new ColaPCB();
         PCB pcb;
 
         // 1. Mover todos los procesos de la cola externa a una cola temporal
-        // Esto es necesario porque FB asume el control total de la cola de listos.
         while ((pcb = colaListosExterna.remover()) != null) {
             temp.agregar(pcb);
         }
 
         // 2. Distribuir desde la cola temporal a la Cola 0 interna
         while ((pcb = temp.remover()) != null) {
+
             // Asumiendo que estaEnColasFeedback(pcb) siempre será falso para nuevos procesos
             if (!estaEnColasFeedback(pcb)) {
+
+                // 👈 AJUSTE CRÍTICO: Establecer el índice de cola en el PCB
+                pcb.setColaFB(0); 
+
                 colas[0].agregar(pcb); // Añadir a la cola de mayor prioridad
             }
         }
@@ -160,7 +164,7 @@ public class FBPlanificador implements Planificador {
     
     @Override
     public String getNombre() {
-        return "Feedback (FB) - Multinivel con Retroalimentación";
+        return "Feedback";
     }
     
     // Getters para la interfaz gráfica

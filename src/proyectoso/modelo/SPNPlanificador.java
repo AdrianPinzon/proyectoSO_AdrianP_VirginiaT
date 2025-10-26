@@ -35,6 +35,6 @@ public class SPNPlanificador implements Planificador {
 
     @Override
     public String getNombre() {
-        return "Shortest Process Next (SPN)";
+        return "Shortest Process Next";
     }
 }

@@ -33,6 +33,6 @@ public class SRTPlanificador implements Planificador {
 
     @Override
     public String getNombre() {
-        return "Shortest Remaining Time (SRT)";
+        return "Shortest Remaining Time";
     }
 }

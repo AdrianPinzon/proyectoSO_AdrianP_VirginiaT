@@ -37,7 +37,7 @@ public class RoundRobinPlanificador implements Planificador {
     
     @Override
     public String getNombre() {
-        return "Round Robin (Quantum: " + quantum + ")";
+        return "Round Robin";
     }
     
     public void setQuantum(int quantum) {

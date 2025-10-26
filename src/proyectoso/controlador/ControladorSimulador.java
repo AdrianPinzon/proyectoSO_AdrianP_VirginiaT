@@ -267,6 +267,39 @@ public class ControladorSimulador {
         guardarConfiguracion(); 
     }
     
+    public void agregarCargaMasiva() {
+        logger.log("Iniciando carga de 20 procesos aleatorios...");
+
+        // Usar un bucle para generar 20 procesos
+        for (int i = 0; i < 20; i++) {
+
+            // Simular variación: 50% CPU-Bound, 50% I/O-Bound
+            TipoProceso tipo = (i % 2 == 0) ? TipoProceso.CPU_BOUND : TipoProceso.IO_BOUND;
+
+            // Simular variación de longitud de instrucciones (entre 20 y 100)
+            int totalInstrucciones = (int) (Math.random() * 80) + 20; 
+
+            // Obtener la configuración actual (para ciclos E/S)
+            Configuracion config = configuracion; 
+
+            // El nombre es único
+            String nombre = "ProcesoMasivo-" + (i + 1);
+
+            // Llamar a la lógica de agregar proceso. 
+            
+            // ya maneja la creación de ID y la aplicación de los ciclos E/S.
+            agregarProceso(nombre, totalInstrucciones, tipo);
+        }
+
+        // Asegurar que la simulación arranque o la vista se actualice
+        if (!hiloSimulador.isEjecutando()) {
+            iniciarSimulacion(); 
+        } else {
+            actualizarVista();
+        }
+        logger.log("Carga masiva de 20 procesos finalizada.");
+    }
+    
     // MÉTRICAS Y ESTADÍSTICAS
     
     public Metricas getMetricas() {

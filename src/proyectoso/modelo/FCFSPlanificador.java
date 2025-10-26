@@ -15,6 +15,6 @@ public class FCFSPlanificador implements Planificador {
     }
     @Override
     public String getNombre() {
-    return "First-Come, First-Served (FCFS)";
+    return "First-Come, First-Served";
 }
 }

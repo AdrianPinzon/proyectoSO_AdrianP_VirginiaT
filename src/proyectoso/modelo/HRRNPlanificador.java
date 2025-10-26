@@ -41,6 +41,6 @@ public class HRRNPlanificador implements Planificador {
 
     @Override
     public String getNombre() {
-        return "Highest Response Ratio Next (HRRN)";
+        return "Highest Response Ratio Next";
     }
 }
