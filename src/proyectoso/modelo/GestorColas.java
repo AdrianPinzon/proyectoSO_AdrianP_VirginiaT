@@ -5,6 +5,7 @@
 package proyectoso.modelo;
 import proyectoso.controlador.ListaHilosExcepcion; 
 import proyectoso.hilos.HiloExcepcion;
+import proyectoso.controlador.ControladorSimulador; 
 
 public class GestorColas {
     // COLAS PRINCIPALES (REQUERIDAS)
@@ -20,6 +21,7 @@ public class GestorColas {
     private ColaPCB colaNuevos;
     
     private ListaHilosExcepcion listaHilosExcepcion; // 👈 Referencia
+    private ControladorSimulador controlador;
     
     // Planificador actual
     private Planificador planificador;
@@ -27,15 +29,17 @@ public class GestorColas {
     // Contadores para métricas
     private int cicloActual;
     private int procesosCompletados;
-    
-    
-    public GestorColas() {
+       
+    public GestorColas(ControladorSimulador controlador, ListaHilosExcepcion hilosExcepciones) {
+        this.controlador = controlador;
+        this.listaHilosExcepcion = hilosExcepciones;
         this.colaListos = new ColaPCB();
         this.colaBloqueados = new ColaPCB();
         this.colaTerminados = new ColaPCB();
         this.colaListosSuspendidos = new ColaPCB();
         this.colaBloqueadosSuspendidos = new ColaPCB();
         this.colaNuevos = new ColaPCB();
+        this.controlador = controlador;
         
         // Planificador por defecto
         this.planificador = new FCFSPlanificador();
@@ -173,6 +177,9 @@ public class GestorColas {
         );
         listaHilosExcepcion.agregar(hilo); // Añadir a la lista de hilos activos
         hilo.start();
+        
+        // 👈 REGISTRO DE TRANSICIÓN CRÍTICO
+        controlador.getLogger().log("Proceso " + pcb.getNombre() + " entra en estado de bloqueo (E/S).");
     }
     
     /**
@@ -183,6 +190,9 @@ public class GestorColas {
         pcb.setTiempoFinalizacion(cicloActual);
         colaTerminados.agregar(pcb);
         procesosCompletados++;
+        
+        // 👈 REGISTRO DE TRANSICIÓN CRÍTICO
+        controlador.getLogger().log("Proceso " + pcb.getNombre() + " culminado.");
     }
     
     /**

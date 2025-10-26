@@ -25,6 +25,7 @@ public class HiloSimulador extends Thread {
     private int duracionCicloMs; // REQUERIDO: duración configurable del ciclo
     private PCB procesoEjecutando;
     private Semaphore semaforo;
+    private String modoActual = "Inicializando"; // O "Sistema Operativo"
     
     // Contadores para Round Robin
     private int contadorQuantum;
@@ -68,11 +69,17 @@ public class HiloSimulador extends Thread {
         }
     }
     
+    public void setModoActual(String modo) {
+        this.modoActual = modo;
+    }
+
     /**
      * Ejecuta un ciclo completo de simulación
      */
     private void ejecutarCicloSimulacion() {
         try {
+            // 👈 MODO KERNEL (SO): Inicio del cambio de contexto
+            setModoActual("Sistema Operativo");
             semaforo.acquire(); // REQUERIDO: exclusión mutua
             
             // 1. Ejecutar ciclo del gestor de colas
@@ -83,6 +90,8 @@ public class HiloSimulador extends Thread {
             
             // 3. Seleccionar nuevo proceso si es necesario
             if (procesoEjecutando == null || procesoEjecutando.getEstado() != Estado.EJECUCION) {
+                // 👈 MODO USUARIO: Ejecución de la instrucción
+                setModoActual("Programa de Usuario");
                 seleccionarNuevoProceso();
             }
             
@@ -172,6 +181,9 @@ public class HiloSimulador extends Thread {
             procesoEjecutando = siguiente;
             procesoEjecutando.setEstado(Estado.EJECUCION);
             
+            // REGISTRO DE SELECCIÓN CRÍTICO
+            controlador.getLogger().log("Planificador selecciona: " + siguiente.getNombre()); //
+            
             // Reiniciar contador de quantum
             contadorQuantum = 0;
         }
@@ -248,4 +260,9 @@ public class HiloSimulador extends Thread {
             );
         }
     }
+    
+    public String getModoActual() {
+        return modoActual;
+    }
+    
 }

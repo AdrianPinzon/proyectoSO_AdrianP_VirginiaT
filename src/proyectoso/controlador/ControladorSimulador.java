@@ -7,8 +7,7 @@ package proyectoso.controlador;
 import proyectoso.modelo.*;
 import proyectoso.hilos.*;
 import proyectoso.util.*;
-import proyectoso.vista.Vista; 
-
+import proyectoso.vista.Vista;
 /*
 Gestiona la interacción entre el Modelo y la Vista, tiene ejecución concurrente a través de
 los hilos de simulación.
@@ -35,10 +34,11 @@ public class ControladorSimulador {
     private volatile boolean simulacionActiva;
     
     public ControladorSimulador() {
-        this.gestorColas = new GestorColas();
+        this.logger = new Logger();
+        this.hilosExcepciones = new ListaHilosExcepcion();
+        this.gestorColas = new GestorColas(this, this.hilosExcepciones );
         this.configuracion = new Configuracion();
         this.hilosExcepciones = new ListaHilosExcepcion();
-        this.logger = new Logger();
         this.gestorArchivos = new GestorArchivos();
         this.simulacionActiva = false;
         
