@@ -9,6 +9,7 @@ public class Configuracion {
     private int quantum;
     private int ciclosExcepcion;
     private int ciclosSatisfaccion;
+    private int numProcesadores = 2;
     
     public Configuracion() {
         this.duracionCicloMs = 1000;
@@ -29,4 +30,7 @@ public class Configuracion {
     
     public int getCiclosSatisfaccion() { return ciclosSatisfaccion; }
     public void setCiclosSatisfaccion(int ciclosSatisfaccion) { this.ciclosSatisfaccion = ciclosSatisfaccion; }
+    
+    public int getNumProcesadores() { return numProcesadores; }
+    public void setNumProcesadores(int numProcesadores) { this.numProcesadores = numProcesadores; }
 }

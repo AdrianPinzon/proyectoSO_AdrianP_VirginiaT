@@ -3,13 +3,16 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package proyectoso.modelo;
+import proyectoso.controlador.ControladorSimulador;
 
 public class FBPlanificador implements Planificador {
     private ColaPCB[] colas;
     private int[] quantums;
     private int numeroColas;
+    private ControladorSimulador controlador;
     
-    public FBPlanificador() {
+    public FBPlanificador(ControladorSimulador controlador) {
+        this.controlador = controlador;
         this.numeroColas = 3; // 3 niveles de feedback
         this.colas = new ColaPCB[numeroColas];
         this.quantums = new int[numeroColas];
@@ -95,15 +98,32 @@ public class FBPlanificador implements Planificador {
         }
         
         if (colaActual != -1) {
-            // Remover de cola actual
-            colas[colaActual].removerPCB(proceso);
-            
-            // Mover a siguiente cola (si no es la última)
-            if (colaActual < numeroColas - 1) {
-                colas[colaActual + 1].agregar(proceso);
+    
+            // 1. Remover de cola actual (e.g., Cola 0)
+            boolean removido = colas[colaActual].removerPCB(proceso); // 👈 Guardar resultado
+
+            if (removido) {
+
+                // Mover a siguiente cola (si no es la última)
+                if (colaActual < numeroColas - 1) {
+                    colas[colaActual + 1].agregar(proceso);
+                    proceso.setEstado(Estado.LISTO);
+
+                    // 👈 REGISTRO DE TRACE: Verificar si se movió a Cola 1
+                    controlador.getLogger().log("FB Degradación: Proceso " + proceso.getNombre() + 
+                                               " movido con éxito a Cola " + (colaActual + 1));
+                } else {
+                    // Última cola
+                    colas[colaActual].agregar(proceso);
+                    proceso.setEstado(Estado.LISTO);
+                    // 👈 REGISTRO DE TRACE: Verificar reencolamiento
+                    controlador.getLogger().log("FB Degradación: Proceso " + proceso.getNombre() + 
+                                               " reencolado en Cola " + colaActual);
+                }
+
             } else {
-                // Si es la última cola, volver a agregar al final (Round Robin en última cola)
-                colas[colaActual].agregar(proceso);
+                // 👈 REGISTRO DE ERROR: Si removerPCB falló (P1 desapareció sin moverse)
+                controlador.getLogger().log("FB ERROR: Falló remoción de P1 de Cola " + colaActual + ". El proceso se ha perdido.");
             }
         }
     }

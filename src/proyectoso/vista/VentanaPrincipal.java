@@ -47,6 +47,7 @@ public class VentanaPrincipal extends JFrame implements Vista {
     // COMPONENTES DE CONFIGURACIÓN
     private JSpinner spinnerDuracionCiclo, spinnerQuantum;
     private JSpinner spinnerCiclosExcepcion, spinnerCiclosSatisfaccion;
+    private JSpinner spinnerNumProcesadores;
     
     // COMPONENTES DE MÉTRICAS
     private JLabel lblThroughput, lblUtilizacionCPU, lblTiempoRespuesta;
@@ -241,6 +242,11 @@ public class VentanaPrincipal extends JFrame implements Vista {
         panelConfiguracion.add(new JLabel("Ciclos para satisfacer E/S:"));
         panelConfiguracion.add(spinnerCiclosSatisfaccion);
         
+        // CREACIÓN DEL SPINNER (Límites requeridos: entre 2 y 3) 
+        spinnerNumProcesadores = new JSpinner(new SpinnerNumberModel(config.getNumProcesadores(), 1, 4, 1) );// Rango de 1 a 4, aunque el requisito pide entre 2 y 3
+        panelConfiguracion.add(new JLabel("Número de Procesadores:"));
+        panelConfiguracion.add(spinnerNumProcesadores);
+        
         // BOTÓN PARA APLICAR CONFIGURACIÓN
         JButton btnAplicarConfig = new JButton("Aplicar Configuración");
         btnAplicarConfig.addActionListener(e -> aplicarConfiguracion());
@@ -306,11 +312,13 @@ public class VentanaPrincipal extends JFrame implements Vista {
         int quantum = (Integer) spinnerQuantum.getValue();
         int ciclosExcepcion = (Integer) spinnerCiclosExcepcion.getValue();
         int ciclosSatisfaccion = (Integer) spinnerCiclosSatisfaccion.getValue();
+        int numProcesadores = (Integer) spinnerNumProcesadores.getValue();
         
         controlador.configurarDuracionCiclo(duracionCiclo);
         controlador.configurarQuantum(quantum);
         controlador.configurarCiclosExcepcion(ciclosExcepcion);
         controlador.configurarCiclosSatisfaccion(ciclosSatisfaccion);
+        controlador.configurarNumProcesadores(numProcesadores);
     }
     
     private void mostrarDialogoAgregarProceso() {
@@ -455,6 +463,7 @@ public class VentanaPrincipal extends JFrame implements Vista {
 
             for (int i = 0; i < fb.getNumeroColas(); i++) {
                 areaListos.append("=== COLA " + i + " (Quantum: " + fb.getQuantum(i) + ") ===\n");
+                ColaPCB cola = fb.getCola(i);
                 if (fb.getCola(i) != null && !fb.getCola(i).estaVacia()) {
                     PCB[] procesos = fb.getCola(i).toArray();
                     for (PCB pcb : procesos) {
@@ -472,7 +481,6 @@ public class VentanaPrincipal extends JFrame implements Vista {
         }
 
         // LAS OTRAS COLAS SIEMPRE SE MUESTRAN NORMAL
-        actualizarAreaCola(areaListos, controlador.getGestorColas().getColaListos());
         actualizarAreaCola(areaBloqueados, controlador.getGestorColas().getColaBloqueados());
         actualizarAreaCola(areaTerminados, controlador.getGestorColas().getColaTerminados());
         actualizarAreaCola(areaListosSuspendidos, controlador.getGestorColas().getColaListosSuspendidos());

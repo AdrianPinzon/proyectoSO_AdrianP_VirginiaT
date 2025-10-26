@@ -156,17 +156,20 @@ public class HiloSimulador extends Thread {
         if (contadorQuantum >= quantumMaximo) {
             // Quantum agotado
             if (procesoEjecutando != null && !procesoEjecutando.estaTerminado()) {
-                procesoEjecutando.setEstado(Estado.LISTO);
 
                 // Lógica específica para FB: mover a siguiente cola
                 if (gestorColas.getPlanificador() instanceof FBPlanificador) {
-                    ((FBPlanificador) gestorColas.getPlanificador()).procesoExpulsado(procesoEjecutando);
+                    FBPlanificador fb = (FBPlanificador) gestorColas.getPlanificador();
+                    fb.procesoExpulsado(procesoEjecutando); // Degradación a Cola 1
+
+                    procesoEjecutando.setEstado(Estado.LISTO); // ¡El proceso debe estar LISTO!
+                    procesoEjecutando = null;
+
                 } else {
-                    // Para otros planificadores, volver a cola normal
+                    // Para otros planificadores (RR, etc.)
+                    procesoEjecutando.setEstado(Estado.LISTO);
                     gestorColas.getColaListos().agregar(procesoEjecutando);
                 }
-
-                procesoEjecutando = null;
             }
             contadorQuantum = 0;
         }

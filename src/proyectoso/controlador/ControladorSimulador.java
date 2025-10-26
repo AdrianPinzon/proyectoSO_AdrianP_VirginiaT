@@ -206,7 +206,7 @@ public class ControladorSimulador {
             case "HRRN":
                 return new HRRNPlanificador(true);
             case "FB":  
-            return new FBPlanificador();
+            return new FBPlanificador(this);
         default:
             return new FCFSPlanificador();
         }
@@ -250,6 +250,21 @@ public class ControladorSimulador {
         configuracion.setCiclosSatisfaccion(ciclos); // Asume que Configuracion tiene el setter
         logger.log("Ciclos de satisfacción configurados a: " + ciclos);
         guardarConfiguracion(); // Guarda el cambio
+    }
+    
+    public void configurarNumProcesadores(int numProcesadores) {
+        // 1. Validar el límite requerido (aunque el spinner lo controle)
+        if (numProcesadores < 1 || numProcesadores > 4) {
+            logger.log("Advertencia: Número de procesadores fuera de rango.");
+            return;
+        }
+
+        // 2. Guardar en el objeto de configuración
+        configuracion.setNumProcesadores(numProcesadores); 
+        logger.log("Número de procesadores configurado a: " + numProcesadores);
+
+        // 3. Forzar el guardado en el archivo (TXT/CSV/JSON) [cite: 15]
+        guardarConfiguracion(); 
     }
     
     // MÉTRICAS Y ESTADÍSTICAS
