@@ -30,6 +30,11 @@ public class PCB {
     private int tiempoFinalizacion;
     private int memoriaRequerida;
     
+    private int colaFB = 0; // Por defecto, empieza en Cola 0
+
+    public int getColaFB() { return colaFB; }
+    public void setColaFB(int colaFB) { this.colaFB = colaFB; }
+    
     // Constructor
     public PCB(String id, String nombre, int totalInstrucciones, TipoProceso tipo) {
         this.id = id;

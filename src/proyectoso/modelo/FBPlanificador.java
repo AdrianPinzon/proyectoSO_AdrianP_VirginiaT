@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package proyectoso.modelo;
 import proyectoso.controlador.ControladorSimulador;
 
@@ -88,8 +84,8 @@ public class FBPlanificador implements Planificador {
      * Lo mueve a la siguiente cola de menor prioridad
      */
     public void procesoExpulsado(PCB proceso) {
-        // Buscar en qué cola está actualmente
-        int colaActual = -1;
+        // Buscar en qu é cola está actualmente
+        int colaActual = proceso.getColaFB();
         for (int i = 0; i < numeroColas; i++) {
             if (colas[i].contiene(proceso)) {
                 colaActual = i;
@@ -97,7 +93,7 @@ public class FBPlanificador implements Planificador {
             }
         }
         
-        if (colaActual != -1) {
+        if (colaActual != -1 && colaActual < numeroColas){
     
             // 1. Remover de cola actual (e.g., Cola 0)
             boolean removido = colas[colaActual].removerPCB(proceso); // 👈 Guardar resultado
@@ -107,6 +103,7 @@ public class FBPlanificador implements Planificador {
                 // Mover a siguiente cola (si no es la última)
                 if (colaActual < numeroColas - 1) {
                     colas[colaActual + 1].agregar(proceso);
+                    proceso.setColaFB(colaActual + 1);
                     proceso.setEstado(Estado.LISTO);
 
                     // 👈 REGISTRO DE TRACE: Verificar si se movió a Cola 1

@@ -1,8 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
 package proyectoso.hilos;
 
 import proyectoso.modelo.*;
@@ -43,31 +38,6 @@ public class HiloSimulador extends Thread {
         this.quantumActual = 3; // Quantum por defecto para Round Robin
     }
     
-    @Override
-    public void run() {
-        ejecutando = true;
-        
-        while (ejecutando) {
-            try {
-                if (!pausado) {
-                    // EJECUTAR UN CICLO DE SIMULACIÓN
-                    ejecutarCicloSimulacion();
-                    
-                    // Notificar al controlador para actualizar la interfaz
-                    controlador.actualizarVista();
-                }
-                
-                // Esperar según la duración del ciclo configurada
-                Thread.sleep(duracionCicloMs);
-                
-            } catch (InterruptedException e) {
-                System.out.println("Hilo de simulación interrumpido");
-                break;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
     
     public void setModoActual(String modo) {
         this.modoActual = modo;
@@ -266,6 +236,32 @@ public class HiloSimulador extends Thread {
     
     public String getModoActual() {
         return modoActual;
+    }
+    
+    @Override
+    public void run() {
+        ejecutando = true;
+        
+        while (ejecutando) {
+            try {
+                if (!pausado) {
+                    // EJECUTAR UN CICLO DE SIMULACIÓN
+                    ejecutarCicloSimulacion();
+                    
+                    // Notificar al controlador para actualizar la interfaz
+                    controlador.actualizarVista();
+                }
+                
+                // Esperar según la duración del ciclo configurada
+                Thread.sleep(duracionCicloMs);
+                
+            } catch (InterruptedException e) {
+                System.out.println("Hilo de simulación interrumpido");
+                break;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
     
 }
