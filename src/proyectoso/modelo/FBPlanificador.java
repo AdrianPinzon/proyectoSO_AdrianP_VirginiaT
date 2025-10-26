@@ -1,7 +1,7 @@
 package proyectoso.modelo;
 import proyectoso.controlador.ControladorSimulador;
 
-public class FBPlanificador implements Planificador {
+public class FBPlanificador implements Planificador { 
     private ColaPCB[] colas;
     private int[] quantums;
     private int numeroColas;
